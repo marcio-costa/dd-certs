@@ -1,0 +1,1580 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Datadog Fundamentals Quiz — Marcio</title>
+<style>
+  :root{
+    --bg:#0f1117;--panel:#171a23;--panel2:#1e2230;--border:#2a2f3d;
+    --text:#e6e8ee;--mute:#9aa0ad;--accent:#774aff;--accent2:#9b7bff;
+    --ok:#2ecc71;--bad:#ff5566;--warn:#ffb02e;--code:#0c0e15;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  a{color:var(--accent2);text-decoration:none;border-bottom:1px dotted var(--accent2)}
+  a:hover{color:#cab8ff}
+  header{padding:18px 24px;border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,#191c27,#13151d);position:sticky;top:0;z-index:5}
+  h1{margin:0 0 4px 0;font-size:20px;letter-spacing:.2px}
+  .sub{color:var(--mute);font-size:13px}
+  main{max-width:1100px;margin:0 auto;padding:18px 20px 80px}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 16px}
+  .tab{padding:9px 14px;background:var(--panel);border:1px solid var(--border);
+    border-radius:10px;cursor:pointer;color:var(--text);font-size:13px;
+    display:flex;align-items:center;gap:8px;transition:.15s}
+  .tab:hover{background:var(--panel2)}
+  .tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .tab .badge{background:rgba(255,255,255,.1);padding:1px 7px;border-radius:999px;font-size:11px}
+  .tab.active .badge{background:rgba(0,0,0,.25)}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:14px}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px}
+  .btn{background:var(--panel2);border:1px solid var(--border);color:var(--text);
+    padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;transition:.15s}
+  .btn:hover{background:#252b3b}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{background:#8a5fff}
+  .progress{flex:1;height:8px;background:var(--panel2);border-radius:6px;overflow:hidden;min-width:160px}
+  .progress > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:.3s}
+  .stats{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--mute)}
+  .stat b{color:var(--text)}
+  .qcard{margin-top:8px}
+  .qmeta{display:flex;gap:8px;align-items:center;color:var(--mute);font-size:12px;margin-bottom:8px}
+  .pill{padding:2px 8px;border-radius:999px;font-size:11px;letter-spacing:.3px;text-transform:uppercase}
+  .pill.E{background:#1e3a2a;color:#7ee2a5}
+  .pill.M{background:#3a311e;color:#ffd591}
+  .pill.H{background:#3a1e26;color:#ff96a4}
+  .qtext{font-size:16px;line-height:1.5;margin:4px 0 14px;font-weight:500}
+  .options{display:grid;gap:8px;margin-bottom:10px}
+  .opt{padding:11px 14px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;
+    cursor:pointer;text-align:left;color:var(--text);font-size:14px;transition:.15s;display:flex;gap:10px}
+  .opt:hover:not(.disabled){background:#252b3b;border-color:#3a4156}
+  .opt.disabled{cursor:default}
+  .opt .letter{font-weight:700;color:var(--mute);min-width:18px}
+  .opt.correct{background:#1c3d2a;border-color:#2ecc71;color:#d6f5e1}
+  .opt.correct .letter{color:#2ecc71}
+  .opt.incorrect{background:#3d1c24;border-color:#ff5566;color:#f5d6dc}
+  .opt.incorrect .letter{color:#ff5566}
+  .opt.was-correct{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.4)}
+  .explanation{margin-top:12px;padding:14px;background:var(--code);border:1px solid var(--border);
+    border-radius:10px;display:none;font-size:14px}
+  .explanation.shown{display:block;animation:fade .2s ease}
+  .explanation .label{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;
+    font-weight:700;letter-spacing:.5px;margin-right:8px;text-transform:uppercase}
+  .explanation .label.ok{background:#1c3d2a;color:#7ee2a5}
+  .explanation .label.bad{background:#3d1c24;color:#ff96a4}
+  .explanation .doc{display:block;margin-top:10px;font-size:13px}
+  .nav{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .summary{padding:22px;text-align:center}
+  .summary .score{font-size:42px;font-weight:700;margin:8px 0}
+  .summary .score.good{color:var(--ok)}
+  .summary .score.mid{color:var(--warn)}
+  .summary .score.bad{color:var(--bad)}
+  .breakdown{display:grid;gap:8px;margin-top:14px}
+  .breakdown .row{display:flex;justify-content:space-between;padding:8px 12px;background:var(--panel2);border-radius:8px;font-size:13px}
+  .empty{padding:30px;text-align:center;color:var(--mute)}
+  details{margin-top:8px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:8px 12px}
+  details > summary{cursor:pointer;color:var(--mute);font-size:13px}
+  kbd{background:var(--code);border:1px solid var(--border);border-bottom-width:2px;
+    padding:1px 6px;border-radius:4px;font-size:12px;font-family:ui-monospace,Menlo,monospace}
+  code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:13px;font-family:ui-monospace,Menlo,monospace}
+  @keyframes fade{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:none}}
+  @media(max-width:640px){.qtext{font-size:15px}.stats{font-size:12px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Datadog Fundamentals — Practice Quiz</h1>
+  <div class="sub">~300 questions across 6 official exam domains · Immediate feedback with documentation links · Built for Marcio</div>
+</header>
+
+<main>
+  <div class="panel">
+    <div class="controls">
+      <button class="btn" id="shuffleBtn">Shuffle questions</button>
+      <button class="btn" id="resetBtn">Reset domain</button>
+      <button class="btn" id="reviewBtn">Review missed</button>
+      <div class="progress"><div id="progressBar"></div></div>
+    </div>
+    <div class="stats">
+      <span class="stat">Domain: <b id="stDomain">—</b></span>
+      <span class="stat">Question: <b id="stPos">0 / 0</b></span>
+      <span class="stat">Correct: <b id="stCorrect">0</b></span>
+      <span class="stat">Incorrect: <b id="stWrong">0</b></span>
+      <span class="stat">Score: <b id="stScore">—</b></span>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div id="quizArea"></div>
+</main>
+
+<script>
+/* ====== QUESTION BANK ======
+   Each question schema:
+   q  : question text (HTML allowed)
+   o  : options array (4)
+   c  : correct option index (0-3)
+   e  : explanation (HTML allowed)
+   u  : documentation URL
+   l  : difficulty (E/M/H)
+*/
+const DOMAINS = [
+  {id:"essential", name:"Essential Concepts", icon:"\u25CF",
+   blurb:"Hardware, networking, config files, observability fundamentals.",
+   questions: [
+    /* --- EASY (15) --- */
+    {l:"E",q:"Which of the three pillars of observability captures discrete events with rich, structured context (e.g., a request error with stack trace and user ID)?",
+      o:["Metrics","Logs","Traces","Profiles"], c:1,
+      e:"Logs are timestamped records of discrete events with rich context. Metrics are numeric measurements aggregated over time; traces follow a request across services; profiles capture code-level performance.",
+      u:"https://docs.datadoghq.com/logs/"},
+    {l:"E",q:"What does CPU stand for?",
+      o:["Central Processing Unit","Compute Performance Utility","Core Processor Underclock","Common Programming Unit"], c:0,
+      e:"CPU = Central Processing Unit. Datadog reports CPU usage as a host-level metric (system.cpu.user, system.cpu.system, etc.).",
+      u:"https://docs.datadoghq.com/integrations/system/"},
+    {l:"E",q:"Which file format does the Datadog Agent use for its main configuration file?",
+      o:["JSON","YAML","XML","INI"], c:1,
+      e:"datadog.yaml is YAML-formatted. Integration configurations under conf.d/&lt;integration&gt;.d/conf.yaml are also YAML.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-configuration-files/"},
+    {l:"E",q:"In a YAML configuration file, what is the most common cause of a 'mapping values are not allowed here' parsing error?",
+      o:["Using tabs instead of spaces for indentation","Comments starting with #","Quoted strings","Multi-line values"], c:0,
+      e:"YAML requires consistent space-based indentation. Tabs are disallowed and the most frequent cause of parse failures in datadog.yaml.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/yaml-parsing/"},
+    {l:"E",q:"Which Linux command displays the running processes on a host?",
+      o:["ls","ps","cd","grep"], c:1,
+      e:"<code>ps</code> reports running processes. <code>ls</code> lists files, <code>cd</code> changes directories, <code>grep</code> searches text.",
+      u:"https://docs.datadoghq.com/integrations/process/"},
+    {l:"E",q:"Which observability data type is best described as 'a numerical measurement aggregated over time'?",
+      o:["Log","Metric","Trace","Event"], c:1,
+      e:"Metrics are numeric measurements collected and aggregated over time intervals (e.g., CPU %, request count per second).",
+      u:"https://docs.datadoghq.com/metrics/"},
+    {l:"E",q:"What does RAM stand for?",
+      o:["Random Access Memory","Rapid Allocation Module","Read-Aligned Memory","Runtime Application Memory"], c:0,
+      e:"RAM = Random Access Memory. Datadog's system.mem.* metrics report memory usage.",
+      u:"https://docs.datadoghq.com/integrations/system/"},
+    {l:"E",q:"Which networking protocol is connection-oriented and guarantees delivery?",
+      o:["UDP","TCP","ICMP","ARP"], c:1,
+      e:"TCP is connection-oriented and reliable (3-way handshake, retransmissions). UDP is connectionless and best-effort. Datadog Agent uses TCP to ship most data to the intake.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"E",q:"What is the default character used to comment a line in a YAML file?",
+      o:["//","#","--","/*"], c:1,
+      e:"YAML comments begin with <code>#</code>. Anything after # on a line is ignored by the parser.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-configuration-files/"},
+    {l:"E",q:"Which TCP port does HTTPS traffic use by default?",
+      o:["21","22","80","443"], c:3,
+      e:"HTTPS uses TCP port 443. Datadog Agent outbound traffic to the intake uses HTTPS on port 443 (in addition to other ports for specific products).",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"E",q:"What does an IP address uniquely identify on a network?",
+      o:["A user","A network interface","A file","An application port"], c:1,
+      e:"An IP address identifies a network interface on a host. Ports identify processes/services on that host.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"E",q:"Which of the following is a structured data format commonly used for API responses?",
+      o:["CSV","JSON","SVG","PDF"], c:1,
+      e:"JSON (JavaScript Object Notation) is the standard format for Datadog API requests and responses.",
+      u:"https://docs.datadoghq.com/api/latest/"},
+    {l:"E",q:"In the context of observability, what is 'metadata'?",
+      o:["Raw metric values","Information about data — like tags, source, host, environment","Database transactions","Logs from a specific service"], c:1,
+      e:"Metadata is descriptive context attached to telemetry (host, env, service, version, integration tags). It enables filtering, grouping, and correlation across Datadog.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/"},
+    {l:"E",q:"Which Linux command prints the current working directory?",
+      o:["pwd","cwd","dir","whoami"], c:0,
+      e:"<code>pwd</code> = print working directory. Useful when locating Datadog Agent config files like /etc/datadog-agent/datadog.yaml.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-configuration-files/"},
+    {l:"E",q:"In observability, what does 'cardinality' refer to?",
+      o:["The number of CPUs in a host","The number of unique tag combinations on a metric","The total bytes ingested","The retention period"], c:1,
+      e:"Cardinality is the number of unique tag-value combinations for a metric. High cardinality drives custom-metric cost and can degrade query performance.",
+      u:"https://docs.datadoghq.com/metrics/custom_metrics/"},
+    /* --- MEDIUM (25) --- */
+    {l:"M",q:"You edit <code>/etc/datadog-agent/datadog.yaml</code> on a Linux host. What MUST you do for the change to take effect?",
+      o:["Nothing — the Agent reloads YAML changes automatically","Restart the Datadog Agent service","Run <code>datadog-agent flare</code>","Reboot the operating system"], c:1,
+      e:"Most changes to datadog.yaml require restarting the Agent: <code>sudo systemctl restart datadog-agent</code> (Linux). The Agent does not auto-reload its main config.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"You see the following snippet in a YAML config file. Which line is invalid?<br><code>instances:<br>  - host: db01<br>    port: 5432<br>\ttags:<br>      - env:prod</code>",
+      o:["The first line","The host line","The line beginning with a tab","The tags list"], c:2,
+      e:"YAML forbids tabs for indentation. Replace the leading tab with spaces or you will get a parser error.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/yaml-parsing/"},
+    {l:"M",q:"Which statement BEST describes the difference between TCP and UDP?",
+      o:["TCP is unreliable and stateless; UDP is reliable and stateful","TCP is connection-oriented and reliable; UDP is connectionless and best-effort","TCP and UDP are identical at the transport layer","UDP requires a 3-way handshake; TCP does not"], c:1,
+      e:"TCP provides reliable, ordered, connection-oriented delivery (3-way handshake). UDP is connectionless and best-effort — used by DogStatsD on port 8125 for low-overhead metric submission.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"M",q:"A team wants to capture the rate of failed login attempts AND alert on a spike. Which two telemetry types are MOST appropriate?",
+      o:["Logs and metrics","Traces and profiles","Real User Monitoring and synthetics","Network performance monitoring and Topology"], c:0,
+      e:"Logs capture each failed-login event with context; a metric (custom or generated from logs) provides the time-series needed for monitor alerting.",
+      u:"https://docs.datadoghq.com/logs/log_configuration/logs_to_metrics/"},
+    {l:"M",q:"Which HTTP status code class indicates a client-side error?",
+      o:["2xx","3xx","4xx","5xx"], c:2,
+      e:"4xx codes signal client errors (400 Bad Request, 401 Unauthorized, 404 Not Found). 5xx are server errors. Datadog APM and Logs surface both classes in error-rate dashboards.",
+      u:"https://docs.datadoghq.com/tracing/services/services_list/"},
+    {l:"M",q:"What does 'observability' fundamentally aim to answer?",
+      o:["How many servers are running","Why a system is behaving the way it is, from the outside","What software is licensed","Which firewall rules are active"], c:1,
+      e:"Observability lets you ask new questions about a system's internal state from its external outputs (metrics, logs, traces). It is broader than traditional monitoring, which checks pre-defined conditions.",
+      u:"https://docs.datadoghq.com/getting_started/"},
+    {l:"M",q:"In a Datadog Agent integration YAML, instances are listed under which top-level key?",
+      o:["init_config","instances","logs","ad_identifiers"], c:1,
+      e:"Each integration file has <code>init_config</code> (shared settings) and <code>instances</code> (one entry per monitored target). <code>logs</code> and <code>ad_identifiers</code> are optional sections.",
+      u:"https://docs.datadoghq.com/getting_started/integrations/"},
+    {l:"M",q:"Which Linux command would you use to follow a log file as new lines are written?",
+      o:["cat /var/log/datadog/agent.log","head /var/log/datadog/agent.log","tail -f /var/log/datadog/agent.log","ls /var/log/datadog/agent.log"], c:2,
+      e:"<code>tail -f</code> streams new lines appended to a file. This is the standard way to follow agent.log during troubleshooting.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    {l:"M",q:"What is the role of DNS in network communication?",
+      o:["Encrypts traffic between hosts","Resolves domain names to IP addresses","Provides load balancing","Authenticates users"], c:1,
+      e:"DNS translates hostnames (e.g., app.datadoghq.com) to IP addresses. Agents must be able to resolve the Datadog intake endpoint to ship data.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"M",q:"Which metric type is BEST suited to represent the current value of free disk space on a host?",
+      o:["Count","Gauge","Rate","Distribution"], c:1,
+      e:"A gauge represents a value at a point in time. Free disk space is a snapshot value, so system.disk.free is a gauge.",
+      u:"https://docs.datadoghq.com/metrics/types/"},
+    {l:"M",q:"Which of these is NOT one of the three pillars of observability?",
+      o:["Metrics","Logs","Traces","Tickets"], c:3,
+      e:"The three pillars are metrics, logs, and traces. Tickets are an ITSM concept, not a telemetry type.",
+      u:"https://docs.datadoghq.com/getting_started/"},
+    {l:"M",q:"In <code>/etc/datadog-agent/datadog.yaml</code>, which YAML key sets the API key?",
+      o:["api-key","apikey","api_key","key.api"], c:2,
+      e:"The correct key is <code>api_key:</code> (snake_case). Datadog Agent config keys consistently use snake_case YAML.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-configuration-files/"},
+    {l:"M",q:"What kind of storage offers persistent block-level access to data and is typical for OS disks?",
+      o:["RAM","Object storage (e.g., S3)","Block storage (e.g., EBS volume)","CPU cache"], c:2,
+      e:"Block storage (mounted as a disk) is the typical home for OS and database files. Object storage is for unstructured blobs; RAM is volatile.",
+      u:"https://docs.datadoghq.com/integrations/system/"},
+    {l:"M",q:"Which Python feature is commonly used to install third-party packages for Agent custom checks?",
+      o:["yum","apt","pip","brew"], c:2,
+      e:"Datadog ships its own embedded Python with the Agent. Use the Agent's bundled pip (e.g., <code>sudo -u dd-agent /opt/datadog-agent/embedded/bin/pip install ...</code>) for custom-check dependencies.",
+      u:"https://docs.datadoghq.com/developers/write_agent_check/"},
+    {l:"M",q:"Which file path is the canonical home for the main Datadog Agent config on a Linux host?",
+      o:["/opt/datadog/datadog.yaml","/etc/datadog-agent/datadog.yaml","/var/log/datadog/datadog.yaml","/usr/local/datadog/agent.yaml"], c:1,
+      e:"On Linux, the Agent's main configuration file is <code>/etc/datadog-agent/datadog.yaml</code>. Integration configs live under <code>/etc/datadog-agent/conf.d/</code>.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-configuration-files/"},
+    {l:"M",q:"In a JSON payload, which value indicates a missing field?",
+      o:["0","\"\"","null","undefined"], c:2,
+      e:"In JSON, <code>null</code> represents an explicitly missing/empty value. JavaScript-style <code>undefined</code> is not part of JSON.",
+      u:"https://docs.datadoghq.com/api/latest/"},
+    {l:"M",q:"In a shell script, what does <code>#!/bin/bash</code> at the top of a file specify?",
+      o:["A comment","An alias","The shebang: which interpreter executes the script","A YAML directive"], c:2,
+      e:"The shebang line tells the OS which interpreter (here, /bin/bash) should run the script. Without it, the script is interpreted by the user's current shell.",
+      u:"https://docs.datadoghq.com/integrations/"},
+    {l:"M",q:"What is a 'host' in Datadog's data model?",
+      o:["Any tagged resource","A unique billable entity reporting under a single hostname","Only physical servers","A single container"], c:1,
+      e:"A Datadog 'host' is a uniquely identified compute entity (VM, bare-metal, or workload) reporting under one hostname. It is the basis of infrastructure billing for the Agent.",
+      u:"https://docs.datadoghq.com/account_management/billing/pricing/"},
+    {l:"M",q:"Which best describes 'horizontal scaling'?",
+      o:["Adding more CPU/RAM to one machine","Adding more machines that share the load","Reducing instance count","Upgrading the OS"], c:1,
+      e:"Horizontal scaling adds more instances (scale out). Vertical scaling adds resources to a single instance (scale up). Datadog's host map helps visualize horizontal fleets.",
+      u:"https://docs.datadoghq.com/infrastructure/hostmap/"},
+    {l:"M",q:"What is the role of port 22 by default?",
+      o:["HTTP","HTTPS","SSH","SMTP"], c:2,
+      e:"Port 22 is SSH (Secure Shell). It is the default channel administrators use to connect to Linux hosts to install or configure the Datadog Agent.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"M",q:"What kind of data is BEST represented as time-series?",
+      o:["A user profile","A stack trace","CPU usage sampled every 10s","A configuration file"], c:2,
+      e:"Time-series is a sequence of values with timestamps. CPU usage at regular intervals is the canonical example and how Datadog stores most infrastructure metrics.",
+      u:"https://docs.datadoghq.com/metrics/"},
+    {l:"M",q:"Which OS-level concept describes the amount of unused memory that the kernel can quickly reclaim?",
+      o:["Resident set size","Available / cached memory","Swap utilization","Disk I/O wait"], c:1,
+      e:"Cached/available memory (reclaimable buffers and page cache) can be released quickly when applications need RAM. Datadog reports <code>system.mem.usable</code> for this.",
+      u:"https://docs.datadoghq.com/integrations/system/"},
+    {l:"M",q:"Which file extension does the Datadog Agent use for integration YAML configs by default?",
+      o:[".conf",".yml or .yaml",".json",".ini"], c:1,
+      e:"Integration files live in <code>conf.d/&lt;integration&gt;.d/</code> with .yaml (or .yml) extensions; example files end in <code>.example</code>.",
+      u:"https://docs.datadoghq.com/getting_started/integrations/"},
+    {l:"M",q:"What is the function of an inode in a Linux filesystem?",
+      o:["Stores the file's content","Stores filesystem metadata for a file (size, owner, blocks)","Acts as a network socket","Encrypts the file"], c:1,
+      e:"An inode is the data structure that holds a file's metadata (size, permissions, owner, pointers to data blocks). Datadog's system check reports inode usage too.",
+      u:"https://docs.datadoghq.com/integrations/system/"},
+    {l:"M",q:"In a Python custom check, the class you implement extends which base class?",
+      o:["AgentCheck","CheckBase","DDCheck","Monitor"], c:0,
+      e:"Custom checks subclass <code>AgentCheck</code> from <code>datadog_checks.base</code>. The class implements a <code>check(self, instance)</code> method.",
+      u:"https://docs.datadoghq.com/developers/write_agent_check/"},
+    /* --- HARD (10) --- */
+    {l:"H",q:"You configure <code>tags:</code> in <code>datadog.yaml</code> but a downstream integration also sets tags in its instance block. What is the resulting behavior?",
+      o:["Only datadog.yaml tags apply","Only the integration's tags apply","Both sets of tags apply to the integration's metrics","An error is logged and tags are dropped"], c:2,
+      e:"Datadog merges host-level tags (datadog.yaml) with check-level/instance tags. Both apply to the metrics produced by that integration instance.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/assigning_tags/"},
+    {l:"H",q:"A YAML config has a value <code>password: 12345</code>. How is it parsed?",
+      o:["String '12345'","Integer 12345","Boolean true","Null"], c:1,
+      e:"YAML infers types. <code>12345</code> is an integer; for a literal string you must quote it: <code>password: \"12345\"</code>. Misinterpreted types are a common source of integration auth failures.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/yaml-parsing/"},
+    {l:"H",q:"What is the practical implication of UDP being connectionless for DogStatsD?",
+      o:["The Agent always retries failed sends","Metric submission is fire-and-forget; some packets may be lost under load","UDP guarantees ordered delivery","DogStatsD does not work over UDP"], c:1,
+      e:"UDP has no delivery guarantee. DogStatsD favors low overhead — under high load packets can be dropped silently. Datadog provides Unix Domain Socket transport to mitigate this.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/high_throughput/"},
+    {l:"H",q:"Which is the BEST description of the OSI Layer 4?",
+      o:["Physical signaling layer","Network routing layer (IP)","Transport layer (TCP/UDP) — segments, ports, flow control","Application layer (HTTP)"], c:2,
+      e:"OSI Layer 4 is the transport layer where TCP and UDP operate. Ports (8125 for DogStatsD, 8126 for APM) are Layer-4 concepts.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"H",q:"In Python custom checks, what is the difference between <code>self.gauge()</code> and <code>self.count()</code>?",
+      o:["gauge submits an absolute value at a point in time; count submits an increment over the interval","gauge is faster","count is for strings","No difference"], c:0,
+      e:"<code>gauge</code> records a snapshot value; <code>count</code> accumulates an integer over the interval. Choosing the wrong one yields meaningless dashboards.",
+      u:"https://docs.datadoghq.com/metrics/types/"},
+    {l:"H",q:"Why does Datadog recommend immutable infrastructure tags (env, service, version) over user-defined free-form tags?",
+      o:["They are required for the Agent to start","They drive Unified Service Tagging and correlation across metrics, traces, and logs","They reduce storage cost","Tags are otherwise dropped"], c:1,
+      e:"env, service, and version are the three reserved tags that power Unified Service Tagging — the foundation of correlated observability across Datadog products.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/"},
+    {l:"H",q:"In a JSON file, which of the following is INVALID?",
+      o:["{\"a\":1, \"b\":\"x\"}","[1,2,3]","{a:1}","{\"items\":[]}"], c:2,
+      e:"JSON object keys MUST be double-quoted strings. <code>{a:1}</code> is valid JavaScript but invalid JSON. Datadog API payloads must be strict JSON.",
+      u:"https://docs.datadoghq.com/api/latest/"},
+    {l:"H",q:"Why is timestamp accuracy critical for observability data?",
+      o:["For billing only","For correct ordering and correlation between metrics, logs, and traces","Datadog rewrites timestamps server-side","Timestamps don't matter"], c:1,
+      e:"If host clocks drift, log/metric/trace correlation breaks and dashboards lie. Use NTP/chrony on every monitored host.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    {l:"H",q:"How does the Datadog Agent typically handle a network outage when shipping metrics to the intake?",
+      o:["Drops all data immediately","Buffers data in memory (forwarder retry queue) and retries with backoff","Crashes","Switches to UDP automatically"], c:1,
+      e:"The Agent's forwarder buffers payloads in memory and retries on failure with exponential backoff. Persistent buffer-to-disk is available on Agent 7+ for long outages.",
+      u:"https://docs.datadoghq.com/agent/configuration/dual-shipping/"},
+    {l:"H",q:"Which best describes an 'event' in Datadog?",
+      o:["Any metric value","A discrete occurrence in time submitted to the event stream (e.g., deploy, alert, custom)","A monitor configuration","A dashboard widget"], c:1,
+      e:"Events are discrete, time-stamped occurrences shown in the Events Explorer. They include deployments, monitor alerts, and custom-submitted events via API or DogStatsD.",
+      u:"https://docs.datadoghq.com/events/"}
+  ]},
+  {id:"infra", name:"Infrastructure Development", icon:"\u25C6",
+   blurb:"Agent install, API & application keys, running the Agent, hostnames.",
+   questions: [
+    /* --- EASY (15) --- */
+    {l:"E",q:"What is the minimum credential required to install the Datadog Agent on a host?",
+      o:["An application key","An API key","An Org admin password","A signed JWT"], c:1,
+      e:"The Datadog Agent submits data using your organization's <b>API key</b>. Application keys are only required for some Datadog API endpoints.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"E",q:"On Linux, what is the typical Linux user that the Datadog Agent runs as?",
+      o:["root","datadog","dd-agent","admin"], c:2,
+      e:"The Linux package installer creates the <code>dd-agent</code> service user. The Agent runs as this user for security; integrations may need this user to have file/socket access.",
+      u:"https://docs.datadoghq.com/agent/supported_platforms/linux/"},
+    {l:"E",q:"Which command line tool is most commonly used to install the Datadog Agent on Linux via the official one-liner?",
+      o:["wget","curl","scp","ssh"], c:1,
+      e:"Datadog's documented install one-liner pipes the install script via curl: <code>DD_API_KEY=... bash -c \"$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)\"</code>",
+      u:"https://app.datadoghq.com/account/settings/agent/latest"},
+    {l:"E",q:"Which file holds the API key the Agent uses to authenticate with Datadog?",
+      o:["/etc/datadog-agent/datadog.yaml","/etc/datadog-agent/api.key","/var/run/dd-agent.key","/opt/datadog/key"], c:0,
+      e:"The <code>api_key:</code> setting in <code>/etc/datadog-agent/datadog.yaml</code> stores the API key.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-configuration-files/"},
+    {l:"E",q:"On Linux, which systemd command starts the Datadog Agent service?",
+      o:["service datadog start","sudo systemctl start datadog-agent","datadog-agent run --start","sudo agentctl start"], c:1,
+      e:"<code>sudo systemctl start datadog-agent</code> starts the Agent service. <code>stop</code>, <code>restart</code>, and <code>status</code> are the other common subcommands.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"E",q:"By default, which user is automatically created by the Windows installer to run the Datadog Agent?",
+      o:["ddagentuser","datadog","Administrator","SYSTEM"], c:0,
+      e:"The Windows installer creates the <code>ddagentuser</code> local account by default. You can change it at install time.",
+      u:"https://docs.datadoghq.com/agent/basic_agent_usage/windows/"},
+    {l:"E",q:"What is the maximum number of API keys an organization can create in Datadog?",
+      o:["10","50","100","Unlimited"], c:1,
+      e:"Each Datadog organization can have at most 50 API keys and must keep at least one. Names must be unique.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"E",q:"Which file in Datadog Agent on Linux outputs runtime logs by default?",
+      o:["/var/log/datadog/agent.log","/var/log/syslog","/etc/datadog-agent/agent.log","/tmp/dd.log"], c:0,
+      e:"By default, the Agent writes logs to <code>/var/log/datadog/agent.log</code>. Other components (trace-agent, process-agent) also log under that directory.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    {l:"E",q:"True or false: an Application key alone is enough for the Agent to submit metrics.",
+      o:["True","False"], c:1,
+      e:"False. The Agent needs an <b>API key</b> to submit data. Application keys are used by users/applications calling the Datadog API.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"E",q:"Which environment variable is the conventional way to pass the API key to the Agent in containers?",
+      o:["DD_KEY","DD_API_KEY","DATADOG_KEY","API_KEY"], c:1,
+      e:"<code>DD_API_KEY</code> is the canonical environment variable read by the containerized Agent.",
+      u:"https://docs.datadoghq.com/agent/guide/environment-variables/"},
+    {l:"E",q:"What does the Datadog Agent's hostname identify?",
+      o:["The Datadog org","The unique host the Agent is reporting from","The Agent version","The integration ID"], c:1,
+      e:"The Agent hostname is the unique identifier for the host in Datadog. It must be stable and unique to avoid host collisions and duplicate billing.",
+      u:"https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/"},
+    {l:"E",q:"Which Agent version is the current major release line documented at Datadog?",
+      o:["Agent 4","Agent 5","Agent 6","Agent 7"], c:3,
+      e:"Agent 7 is the current major version. Agent 6 is still supported on legacy systems but new installs default to Agent 7 (Python 3).",
+      u:"https://docs.datadoghq.com/agent/"},
+    {l:"E",q:"True or false: a single API key is bound to a single host.",
+      o:["True","False"], c:1,
+      e:"False. An API key authenticates to a Datadog org and can be reused across many Agents/hosts. Application keys, however, are tied to a single user (or service account).",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"E",q:"On macOS, where does the Datadog Agent application typically install?",
+      o:["/usr/local/datadog","/opt/datadog-agent","/Applications/Datadog Agent.app","~/.datadog-agent"], c:2,
+      e:"On macOS, the Agent installs as the <i>Datadog Agent</i> app under /Applications. CLI tooling is available via <code>datadog-agent</code> launched from that app's bundle.",
+      u:"https://docs.datadoghq.com/agent/basic_agent_usage/osx/"},
+    {l:"E",q:"What is the canonical name of the Agent's main configuration directory on Linux?",
+      o:["/opt/datadog","/etc/datadog","/etc/datadog-agent","/var/datadog"], c:2,
+      e:"<code>/etc/datadog-agent</code> contains datadog.yaml, conf.d/, checks.d/, and auth_token. Integration configs live under conf.d/&lt;name&gt;.d/.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-configuration-files/"},
+    /* --- MEDIUM (25) --- */
+    {l:"M",q:"What is the BEST description of the relationship between an API key and an Application key?",
+      o:["They are interchangeable","API keys authenticate the source of data (org); Application keys authorize API actions on behalf of a user","API keys are public; Application keys are private","Both must rotate every 24 hours"], c:1,
+      e:"API key = identifies the org submitting data. Application key = identifies the user/service account taking actions via the API. Many endpoints require BOTH headers.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"M",q:"Which header names are sent when authenticating to most Datadog API endpoints?",
+      o:["X-API-Key and X-App-Key","DD-API-KEY and DD-APPLICATION-KEY","Authorization-API and Authorization-App","DATADOG-API and DATADOG-APP"], c:1,
+      e:"Datadog uses <code>DD-API-KEY</code> and (when required) <code>DD-APPLICATION-KEY</code> headers for API authentication.",
+      u:"https://docs.datadoghq.com/api/latest/authentication/"},
+    {l:"M",q:"You install the Agent on a cloud VM but the host appears in the Datadog UI with the wrong hostname. Which configuration MOST directly fixes this?",
+      o:["Restart the Agent","Set <code>hostname:</code> in datadog.yaml","Update DNS","Clear the browser cache"], c:1,
+      e:"Setting <code>hostname:</code> explicitly in datadog.yaml overrides the auto-detected hostname. After restart the Agent reports under that name.",
+      u:"https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/"},
+    {l:"M",q:"By default, what is the order of precedence for how the Agent picks a hostname (highest first)?",
+      o:["OS hostname → datadog.yaml → cloud metadata","datadog.yaml → cloud provider metadata → OS hostname","Random UUID → datadog.yaml → OS","OS hostname only"], c:1,
+      e:"datadog.yaml's <code>hostname</code> setting is highest priority. If unset, the Agent uses cloud-provider metadata (AWS instance-id, GCE name, Azure name) and falls back to the OS hostname.",
+      u:"https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/"},
+    {l:"M",q:"Which command on Linux confirms the Datadog Agent's current health and integrations status?",
+      o:["datadog-agent info","sudo datadog-agent status","systemctl logs datadog-agent","dd-info"], c:1,
+      e:"<code>sudo datadog-agent status</code> shows running checks, last-collection times, forwarder transactions, and any errors. Critical for live troubleshooting.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"You rotate an API key. What happens to Agents still using the old key?",
+      o:["They keep working forever","Their submissions are rejected once the key is deleted","Datadog migrates them automatically","Only the UI is affected"], c:1,
+      e:"API keys are independent. Once you delete a key, any Agent still holding it gets HTTP 403/401 on submission. Best practice: roll the new key out before deleting the old one.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"M",q:"In a Kubernetes deployment using the Datadog Operator, where do you typically place the API key?",
+      o:["A ConfigMap","A Kubernetes Secret referenced from the DatadogAgent CR","A plain env var in the manifest","The Agent's container image"], c:1,
+      e:"Best practice is to create a Kubernetes Secret holding the API key and reference it from the DatadogAgent custom resource (e.g., <code>credentials.apiSecret</code>).",
+      u:"https://docs.datadoghq.com/containers/kubernetes/installation/"},
+    {l:"M",q:"On Windows, which CLI binary is used to control the Agent (e.g., status, restart)?",
+      o:["dd-agent.exe","datadog.exe","agent.exe","ddagentctl.exe"], c:2,
+      e:"On Windows, <code>agent.exe</code> (installed under <code>C:\\Program Files\\Datadog\\Datadog Agent\\bin\\</code>) provides the CLI: <code>agent.exe status</code>, <code>agent.exe restart</code>, etc.",
+      u:"https://docs.datadoghq.com/agent/basic_agent_usage/windows/"},
+    {l:"M",q:"Which Agent version introduced support for Python 3?",
+      o:["Agent 5","Agent 6","Agent 7","Agent 8"], c:2,
+      e:"Agent 7 ships with Python 3 only. Agent 6 still supports Python 2 (legacy custom checks).",
+      u:"https://docs.datadoghq.com/agent/"},
+    {l:"M",q:"Which is a valid way to install the Agent on a Docker host with one command?",
+      o:["<code>docker run -d --name dd-agent -e DD_API_KEY=&lt;KEY&gt; -e DD_SITE=datadoghq.com gcr.io/datadoghq/agent:7</code>","<code>docker pull datadog</code>","<code>docker compose datadog-agent up</code>","Datadog Agent doesn't run in Docker"], c:0,
+      e:"The documented docker run uses <code>gcr.io/datadoghq/agent:7</code> with <code>DD_API_KEY</code> and <code>DD_SITE</code>. Volume mounts (/var/run/docker.sock, /proc, /sys/fs/cgroup) are typically added for full host visibility.",
+      u:"https://docs.datadoghq.com/containers/docker/"},
+    {l:"M",q:"Which env var sets the Datadog site (region) the Agent ships to?",
+      o:["DD_REGION","DD_SITE","DD_ENDPOINT","DD_DC"], c:1,
+      e:"<code>DD_SITE</code> selects the intake (e.g., datadoghq.com for US1, datadoghq.eu for EU1, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com). Wrong site = silent data loss.",
+      u:"https://docs.datadoghq.com/getting_started/site/"},
+    {l:"M",q:"Where do you find the API key in the Datadog UI?",
+      o:["Profile → Preferences","Organization Settings → API Keys","Agent → Logs","Monitors → API"], c:1,
+      e:"API keys are managed under <i>Organization Settings → API Keys</i>. Application keys live under <i>Personal API/App keys</i> (per user).",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"M",q:"When does the Agent require a restart after configuration changes?",
+      o:["Never — it is fully hot-reloading","After any change to datadog.yaml; for integration configs the Agent auto-reloads conf.d/ files","Only after a kernel update","Only when changing the host's IP"], c:1,
+      e:"Changes to <code>datadog.yaml</code> require a restart. Integration files under <code>conf.d/</code> are picked up automatically by Autodiscovery / config-watcher.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"Which is NOT a valid Agent installation method?",
+      o:["Linux package (deb/rpm)","Docker container","Kubernetes via Helm or Operator","ARM-only mobile app"], c:3,
+      e:"Datadog ships Linux packages, macOS app, Windows MSI, Docker images, Helm charts, the Datadog Operator, and Chef/Puppet/Ansible modules. There is no mobile install path.",
+      u:"https://docs.datadoghq.com/agent/"},
+    {l:"M",q:"Which command rotates an API key (admin task)?",
+      o:["<code>datadog-agent rotate-key</code>","Use the Datadog UI under Organization Settings → API Keys → New Key","<code>curl -X PUT /api/v1/key/rotate</code>","kubectl rotate-secret"], c:1,
+      e:"API keys are created and revoked from the Org Settings page in the UI (or via the API). The Agent CLI does not rotate keys.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"M",q:"On a Linux host with cloud-init, the Datadog Agent install script is invoked at boot. Where should the API key be stored to avoid leaking it?",
+      o:["In cloud-init's plain user-data","In a secrets manager and injected at runtime as DD_API_KEY","In the Git repo","In /tmp"], c:1,
+      e:"Treat API keys as secrets. Use a secrets manager (AWS Secrets Manager, GCP Secret Manager, Vault) and inject DD_API_KEY at runtime.",
+      u:"https://docs.datadoghq.com/agent/guide/secrets-management/"},
+    {l:"M",q:"What is the function of the <code>datadog-agent flare</code> command?",
+      o:["Sends test metrics","Bundles Agent logs, configs, and diagnostic info into an encrypted archive for Support","Restarts the Agent","Rotates the API key"], c:1,
+      e:"<code>sudo datadog-agent flare &lt;CASE_ID&gt;</code> packages diagnostics and sends them to Datadog Support (or saves locally). Standard first step for any support ticket.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/"},
+    {l:"M",q:"Why might two hosts appear under the same hostname in Datadog?",
+      o:["Both hosts have the same auto-detected hostname (e.g., 'localhost' or duplicated OS name)","Datadog merges hosts arbitrarily","API key is shared","DNS is broken"], c:0,
+      e:"Hostname collisions occur when two hosts present the same name. Force unique values via <code>hostname:</code> in datadog.yaml or rely on cloud-provider instance IDs.",
+      u:"https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/"},
+    {l:"M",q:"What is the typical default install path for the Agent on Linux?",
+      o:["/usr/bin/dd","/opt/datadog-agent","/var/datadog","/srv/dd"], c:1,
+      e:"On Linux, binaries and bundled Python live under <code>/opt/datadog-agent/</code>; config under <code>/etc/datadog-agent/</code>.",
+      u:"https://docs.datadoghq.com/agent/supported_platforms/linux/"},
+    {l:"M",q:"True or false: you should commit your Datadog API key to version control as long as the repo is private.",
+      o:["True","False"], c:1,
+      e:"Never commit secrets, even to private repos. Use environment variables or a secrets manager. If leaked, revoke the key immediately in Org Settings.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"M",q:"In containers, what is the recommended way to make the host's OS hostname visible to the Agent?",
+      o:["Hardcode it in datadog.yaml","Mount /proc and /etc/hostname into the container","Use DNS","Use the container ID"], c:1,
+      e:"Mounting <code>/proc</code>, <code>/etc/hostname</code> (and <code>/etc/os-release</code>) gives the containerized Agent access to host metadata, including the hostname.",
+      u:"https://docs.datadoghq.com/containers/docker/"},
+    {l:"M",q:"Which is true of the Datadog Cluster Agent in Kubernetes?",
+      o:["It replaces every node Agent","It deploys as a single (or HA) pod and reduces API-server load by acting as a proxy for cluster-level data","It runs as a DaemonSet alongside node Agents","It is the only component that needs an API key"], c:1,
+      e:"The Cluster Agent runs as a Deployment (1+ replicas). Node-level Datadog Agents talk to it for cluster-scoped data (kube-state-metrics, autodiscovery), reducing API-server load and exposing cluster checks.",
+      u:"https://docs.datadoghq.com/containers/cluster_agent/setup/"},
+    {l:"M",q:"On Linux, which package signs Datadog Agent packages?",
+      o:["GPG keys published by Datadog","Self-signed certificates","No signing","Microsoft Authenticode"], c:0,
+      e:"Datadog signs Linux packages with GPG keys (rotated periodically). The install script imports the right public keys before running apt/yum.",
+      u:"https://docs.datadoghq.com/agent/linux_packages/"},
+    {l:"M",q:"You install the Agent via Helm in Kubernetes. Which Helm value sets the API key from a pre-existing secret?",
+      o:["datadog.apiKey","datadog.apiKeyExistingSecret","apikey","secrets.dd"], c:1,
+      e:"In the Datadog Helm chart, <code>datadog.apiKeyExistingSecret</code> references a secret already in the cluster. <code>datadog.apiKey</code> sets it inline (not recommended).",
+      u:"https://docs.datadoghq.com/containers/kubernetes/installation/?tab=helm"},
+    {l:"M",q:"What does the Agent's auth_token (under /etc/datadog-agent/auth_token) protect?",
+      o:["The Datadog API","The local IPC API used by the Agent's components (CLI talks to running agent)","SSH access","Docker socket"], c:1,
+      e:"The auth_token authorizes local IPC between Agent components and the CLI. Without it, <code>datadog-agent status</code> can't reach the running daemon.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    /* --- HARD (10) --- */
+    {l:"H",q:"A host shows up twice in the Datadog Infrastructure List with very similar hostnames (one with .local, one without). Which is the MOST LIKELY root cause?",
+      o:["Two API keys","The Agent's hostname source differs (cloud metadata vs OS) and the host is reporting under two names","Datadog billing bug","DNS poisoning"], c:1,
+      e:"If <code>hostname:</code> is not explicitly set, the Agent may report under different names from different sources at different times. Pin the hostname in datadog.yaml or use the cloud-provider canonical hostname.",
+      u:"https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/"},
+    {l:"H",q:"In a Docker run command, you mount <code>/var/run/docker.sock</code> read-only into the Agent container. What capability does this provide?",
+      o:["Lets the Agent control containers","Lets the Agent enumerate running containers, fetch labels, and apply Autodiscovery","Disables logs","Lets the Agent run as root"], c:1,
+      e:"The Agent reads the Docker socket to discover running containers and apply Autodiscovery integration templates. Read-only mount is sufficient and safer.",
+      u:"https://docs.datadoghq.com/containers/docker/"},
+    {l:"H",q:"Which is TRUE about Application keys in Datadog?",
+      o:["They are organization-wide","They are tied to a specific user or service account and inherit their permissions/scopes","They never expire","They are required for the Agent"], c:1,
+      e:"App keys are user/service-account scoped, inherit the owner's permissions, and can be further restricted with authorization scopes. Without them, many write APIs are unavailable.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"H",q:"In a multi-org enterprise setup, what is the correct strategy for shipping data from one host to multiple organizations?",
+      o:["Run a single Agent and rotate API keys","Run multiple Agents with different API keys (each pointing to a different org/site)","Use Dual Shipping configuration in datadog.yaml to send to additional endpoints","Both B and C are valid"], c:3,
+      e:"Both approaches work. Dual Shipping (in datadog.yaml) lets a single Agent fan out copies of metrics/logs to a second intake, useful for migrations and multi-org reporting.",
+      u:"https://docs.datadoghq.com/agent/configuration/dual-shipping/"},
+    {l:"H",q:"You set <code>DD_HOSTNAME</code> via the container env var AND configure <code>hostname:</code> in datadog.yaml mounted into the container. Which wins?",
+      o:["datadog.yaml always wins","DD_HOSTNAME env var (env vars take precedence over file config)","Whichever is alphabetically first","Both, leading to duplicate reporting"], c:1,
+      e:"Environment variables override values from datadog.yaml. <code>DD_HOSTNAME</code> wins in this case.",
+      u:"https://docs.datadoghq.com/agent/guide/environment-variables/"},
+    {l:"H",q:"Why is it generally a bad idea to share a single application key across many services or pipelines?",
+      o:["Performance impact","If leaked, all callers must rotate simultaneously; you lose audit attribution","Datadog blocks shared keys","No reason"], c:1,
+      e:"Per-pipeline app keys (or service-account keys with scopes) give you blast-radius containment and clean audit trails when investigating misuse.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"H",q:"You install the Agent on an EC2 instance behind a strict outbound firewall. What is the MINIMAL set of egress rules needed for full metric + log + trace shipping (US1)?",
+      o:["Only port 80","TCP 443 to api.datadoghq.com plus the documented intake endpoints/ports for each product","UDP 8125 outbound","TCP 22 outbound"], c:1,
+      e:"At minimum allow TCP 443 to <code>api.datadoghq.com</code> and the documented per-product intake endpoints (e.g., http-intake.logs.datadoghq.com, trace.agent.datadoghq.com). See Network Traffic doc for the full list.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"H",q:"In Datadog Operator, what is the role of the DatadogAgent custom resource?",
+      o:["Declarative spec describing the desired state of Agent + Cluster Agent + Cluster Check Runner in the cluster","A namespace selector","A Helm chart","A workload monitor"], c:0,
+      e:"The DatadogAgent CR is the operator's reconciliation target: it spec's images, features (APM, logs, NPM), credentials secrets, and node selectors for all Agent components.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/installation/?tab=operator"},
+    {l:"H",q:"A team rotates their API key without staging the new one. What is the immediate consequence?",
+      o:["All Agents and integrations using the old key stop sending data immediately","Data is buffered for 24 hours","Nothing","Datadog auto-migrates Agents"], c:0,
+      e:"Once the old key is deleted, every Agent still using it gets 403/401 and data is dropped (after retry buffer drains). Always deploy the new key first, then delete the old.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"H",q:"Which statement about the Datadog Agent's hostname is MOST accurate?",
+      o:["It must be the FQDN","It must be the OS hostname","It is what Datadog uses to deduplicate hosts and join data; it must be unique and stable","Hostname changes are ignored"], c:2,
+      e:"Hostname is Datadog's primary host identity. Instability (e.g., DHCP changing it every reboot) creates phantom hosts and broken dashboards.",
+      u:"https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/"}
+  ]},
+  {id:"network", name:"Networking & Agent Config", icon:"\u25B2",
+   blurb:"Datadog ports, IP addresses, Autodiscovery.",
+   questions: [
+    /* --- EASY (15) --- */
+    {l:"E",q:"What is the default port the Datadog Agent listens on for DogStatsD over UDP?",
+      o:["8123","8125","8126","8127"], c:1,
+      e:"DogStatsD listens on UDP <b>8125</b> by default. Change with <code>dogstatsd_port:</code> in datadog.yaml.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/"},
+    {l:"E",q:"What is the default port the Datadog APM trace receiver listens on?",
+      o:["8125 UDP","8126 TCP","443 TCP","9092 TCP"], c:1,
+      e:"The trace-agent receives traces on TCP <b>8126</b> by default (<code>apm_config.receiver_port</code>).",
+      u:"https://docs.datadoghq.com/tracing/setup/"},
+    {l:"E",q:"To which port does the Datadog Agent ship most outbound data (metrics, events, service checks)?",
+      o:["TCP 80","TCP 443","UDP 8125","TCP 8126"], c:1,
+      e:"Outbound metric/event traffic goes over HTTPS on TCP <b>443</b> to api.&lt;site&gt;.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"E",q:"Where does Datadog publish the list of IP ranges its services use?",
+      o:["A monthly email","A static doc page","The /api/v1/ip_ranges endpoint at ip-ranges.datadoghq.com","Inside the Agent log"], c:2,
+      e:"Datadog publishes its IP ranges programmatically at <code>https://ip-ranges.datadoghq.com</code> (per site/region) so firewall rules can be kept up to date.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"E",q:"Which protocol does the DogStatsD default port (8125) use?",
+      o:["TCP","UDP","HTTP","gRPC"], c:1,
+      e:"DogStatsD uses UDP for low-overhead metric submission. A Unix domain socket option also exists for higher throughput / no port.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/"},
+    {l:"E",q:"Which technology lets the Datadog Agent automatically detect new containerized services and apply integration configs?",
+      o:["Auto-Provisioning","Autodiscovery","Auto-Inject","Self-Discovery"], c:1,
+      e:"Autodiscovery (AD) watches container/orchestrator events and matches integration templates by image, label, or annotation.",
+      u:"https://docs.datadoghq.com/getting_started/containers/autodiscovery/"},
+    {l:"E",q:"True or false: the Agent must reach the Datadog intake over SSL/TLS.",
+      o:["True","False"], c:0,
+      e:"All Agent traffic to Datadog is sent over TLS (HTTPS).",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"E",q:"In Kubernetes, which mechanism is the recommended way to provide Autodiscovery templates to the Agent?",
+      o:["Hand-edit conf.d files in the container","Pod annotations like <code>ad.datadoghq.com/&lt;container&gt;.check_names</code>","Mount /tmp into the Agent","DNS records"], c:1,
+      e:"Pod annotations (or service annotations for endpoint checks) are the canonical way. The Agent reads them via the Kubernetes API.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/integrations/"},
+    {l:"E",q:"What is the role of the trace-agent within the Datadog Agent suite?",
+      o:["Sends logs","Receives application traces and ships them to Datadog APM","Replaces the main Agent","Runs synthetic tests"], c:1,
+      e:"The trace-agent listens on 8126, batches/samples traces, and ships them to Datadog APM.",
+      u:"https://docs.datadoghq.com/tracing/"},
+    {l:"E",q:"Which port does the Agent's process-agent expose by default? (Tip: it does not require an inbound port.)",
+      o:["8125","8126","No inbound port — process-agent only ships data outbound","6062"], c:2,
+      e:"Process Agent runs in-process and pushes data outbound. It has no inbound listener; an internal debug expvar endpoint may be enabled.",
+      u:"https://docs.datadoghq.com/infrastructure/process/"},
+    {l:"E",q:"True or false: Datadog IP ranges are static.",
+      o:["True","False"], c:1,
+      e:"Datadog IPs change over time and per site. Always pull from <code>https://ip-ranges.datadoghq.com</code> rather than hardcoding.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"E",q:"Which is a valid DogStatsD transport on Linux that bypasses UDP entirely?",
+      o:["Named pipes","Unix Domain Socket (UDS)","SMB","NFS"], c:1,
+      e:"DogStatsD over UDS removes UDP packet-loss risk and adds container origin detection. Configured via <code>dogstatsd_socket</code> in datadog.yaml.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/unix_socket/"},
+    {l:"E",q:"What is the function of <code>ad_identifiers</code> in an integration YAML file?",
+      o:["Sets the API key","Lists images or labels that identify which containers this template should match for Autodiscovery","Defines the port","Tags the host"], c:1,
+      e:"<code>ad_identifiers</code> tells Autodiscovery which containers this template applies to (by image name, container name, or label).",
+      u:"https://docs.datadoghq.com/containers/guide/ad_identifiers/"},
+    {l:"E",q:"What does %%host%% resolve to in an Autodiscovery template?",
+      o:["The Agent's hostname","The IP of the discovered container","The Datadog endpoint","Localhost only"], c:1,
+      e:"<code>%%host%%</code> is a template variable populated with the discovered container's IP at runtime.",
+      u:"https://docs.datadoghq.com/containers/guide/template_variables/"},
+    {l:"E",q:"Which DogStatsD aggregation interval is the default?",
+      o:["1 second","5 seconds","10 seconds","60 seconds"], c:2,
+      e:"DogStatsD aggregates incoming metrics in a flush interval of 10 seconds by default before sending to the intake.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/"},
+    /* --- MEDIUM (25) --- */
+    {l:"M",q:"You want to expose DogStatsD on UDP from a sidecar container to the Agent DaemonSet on Kubernetes. Which is the MOST common pattern?",
+      o:["Use the host network and 127.0.0.1:8125","Mount the Unix Domain Socket via hostPath and send via UDS","Use a Kubernetes Service","Both A and B are valid; UDS is recommended for accurate origin detection"], c:3,
+      e:"Both work. UDS (over a hostPath) is preferred: no UDP loss, plus the Agent can identify the originating container for tagging.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/unix_socket/"},
+    {l:"M",q:"Which port does the Agent's IPC API listen on for local CLI traffic by default?",
+      o:["5001","5050","5002","5004 (cmd_port)"], c:3,
+      e:"The Agent CLI talks to the running daemon on <code>cmd_port</code> (default 5001 on Agent 7; check Agent docs). Setting it incorrectly breaks <code>datadog-agent status</code>.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"Which port does the trace-agent expose for non-Linux UDS submission?",
+      o:["TCP 8126","UDP 8125","TCP 8127","TCP 8128"], c:0,
+      e:"The trace-agent listens on TCP 8126 by default. On Linux you can also use a UDS at /var/run/datadog/apm.socket.",
+      u:"https://docs.datadoghq.com/tracing/setup/"},
+    {l:"M",q:"You want to harden a host so it can ONLY reach Datadog. Where do you get the up-to-date list of CIDRs to allowlist?",
+      o:["docs.datadoghq.com only","ip-ranges.datadoghq.com (JSON endpoint, filtered by site and service)","Public AWS ranges","Hardcode the values from a community list"], c:1,
+      e:"Pull from <code>https://ip-ranges.datadoghq.com</code>. The JSON groups CIDRs by service (api, logs, agents, etc.) and is updated as ranges change.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"M",q:"True or false: changing <code>dogstatsd_port</code> requires no Agent restart.",
+      o:["True","False"], c:1,
+      e:"False. Changes to datadog.yaml (including dogstatsd_port) require an Agent restart.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/"},
+    {l:"M",q:"In Docker, which env var enables Autodiscovery on the Agent?",
+      o:["DD_AD","DD_AUTODISCOVERY","Agent enables AD by default when running with container access","DD_DISCOVER"], c:2,
+      e:"When the Agent runs with access to the container runtime (Docker socket, kubelet) it auto-discovers containers and applies templates. Specific listeners (<code>listeners:</code> in datadog.yaml) can be tuned.",
+      u:"https://docs.datadoghq.com/containers/docker/"},
+    {l:"M",q:"Which is the BEST description of an Autodiscovery 'integration template'?",
+      o:["A static YAML file applied to every host","A YAML doc with placeholders (e.g., %%host%%, %%port%%) that the Agent applies when matching containers appear","A Helm chart","A monitor"], c:1,
+      e:"Templates declare instance/init_config sections with template variables. Datadog ships auto-conf templates for common services (Redis, Postgres) and users can add their own.",
+      u:"https://docs.datadoghq.com/containers/guide/autodiscovery-examples/"},
+    {l:"M",q:"Where would you place an Autodiscovery template for an integration without modifying a container image?",
+      o:["Kubernetes pod annotations","Datadog Agent's <code>conf.d/&lt;integration&gt;.d/auto_conf.yaml</code>","ConfigMap mounted into the Agent","All of the above are valid"], c:3,
+      e:"AD templates can come from pod annotations, Docker labels, the Agent's conf.d directory, ConfigMaps, or key-value stores. Choose by ergonomics for your platform.",
+      u:"https://docs.datadoghq.com/containers/guide/auto_conf/"},
+    {l:"M",q:"Which annotation key prefix is used for AD v2 in Kubernetes?",
+      o:["service.dd/","autodiscover.k8s/","ad.datadoghq.com/&lt;container_name&gt;.*","datadog.io/"], c:2,
+      e:"Annotations follow <code>ad.datadoghq.com/&lt;container_name&gt;.check_names</code>, <code>.init_configs</code>, <code>.instances</code>, and <code>.logs</code>.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/integrations/"},
+    {l:"M",q:"What is the function of the Cluster Check Runner?",
+      o:["Runs node-level integrations only","Runs 'cluster checks' (single-instance checks like external endpoints) and distributes them across runners to balance load","Replaces the API server","Caches logs"], c:1,
+      e:"The Cluster Check Runner is a Deployment that hosts cluster-scoped checks (e.g., an external HTTP endpoint) so they run once for the cluster — and scales for HA.",
+      u:"https://docs.datadoghq.com/containers/cluster_agent/clusterchecks/"},
+    {l:"M",q:"Which file controls listener and provider configuration for Autodiscovery in Agent 7?",
+      o:["/etc/datadog-agent/datadog.yaml under <code>listeners</code> and <code>config_providers</code>","ad.yaml","listeners.conf","auto.yaml"], c:0,
+      e:"<code>listeners:</code> (e.g., docker, kubelet) and <code>config_providers:</code> (e.g., kubernetes, docker) live in datadog.yaml.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-configuration-files/"},
+    {l:"M",q:"Why does Datadog recommend opening egress to api.&lt;site&gt;, http-intake.logs.&lt;site&gt;, trace.agent.&lt;site&gt;, etc. instead of just one host?",
+      o:["For redundancy only","Different products have different intake endpoints; opening all required prevents silent data loss","To distribute load fairly","No specific reason"], c:1,
+      e:"Metrics, logs, traces, NPM, and database monitoring each have distinct intake hostnames. Block any of them and that product silently stops receiving data.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"M",q:"Which transport is BEST for high-throughput DogStatsD on a single host?",
+      o:["UDP","Unix Domain Socket","TCP","HTTP"], c:1,
+      e:"UDS avoids UDP loss under load and packet-size limits. Datadog's high-throughput guide explicitly recommends UDS for heavy custom-metric workloads.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/high_throughput/"},
+    {l:"M",q:"Which is true about the Datadog APM intake hostname?",
+      o:["It is always api.datadoghq.com","It is per-site (e.g., trace.agent.datadoghq.com for US1, trace.agent.eu.datadoghq.com for EU1)","Only one global endpoint","DNS-load-balanced by the Agent"], c:1,
+      e:"APM has a site-specific intake hostname. The Agent picks it based on <code>DD_SITE</code>/<code>site</code> in datadog.yaml.",
+      u:"https://docs.datadoghq.com/getting_started/site/"},
+    {l:"M",q:"You see this in a Pod annotation: <code>ad.datadoghq.com/redis.check_names: '[\"redisdb\"]'</code>. What does it tell the Agent?",
+      o:["Treat the container named 'redis' as a Redis instance and run the 'redisdb' integration on it","Restart Redis","Create a monitor","Disable Redis"], c:0,
+      e:"The annotation maps the container 'redis' to the Datadog 'redisdb' integration. <code>init_configs</code> and <code>instances</code> follow.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/integrations/"},
+    {l:"M",q:"Which port is used by the Datadog Cluster Agent's external metrics provider on Kubernetes by default?",
+      o:["443","8125","5005","8443 (HTTPS for the external metrics API)"], c:3,
+      e:"The Cluster Agent serves the external metrics provider over HTTPS (port 8443 by default) so HPAs can scale on Datadog metrics.",
+      u:"https://docs.datadoghq.com/containers/cluster_agent/external_metrics/"},
+    {l:"M",q:"True or false: opening only UDP 8125 inbound on the host is enough for the Agent to ship data to Datadog.",
+      o:["True","False"], c:1,
+      e:"False. UDP 8125 is inbound for DogStatsD on the host. The Agent ships OUTBOUND on TCP 443 to Datadog intakes — that's the firewall rule that matters.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"M",q:"Which Agent process listens for Log payloads when log collection is enabled?",
+      o:["logs-agent (a subprocess started by the main Agent)","trace-agent","process-agent","No process — logs use UDP 8125"], c:0,
+      e:"The main Agent spawns a logs-agent component when <code>logs_enabled: true</code>. It tails files / receives via TCP/UDP and ships to the log intake on TLS-encrypted TCP.",
+      u:"https://docs.datadoghq.com/agent/logs/"},
+    {l:"M",q:"Which is true about the Datadog Agent's TCP log intake endpoint for US1?",
+      o:["agent-intake.logs.datadoghq.com:10516 (TLS-encrypted TCP)","logs.datadoghq.com:80 (plain HTTP)","UDP 514","No TCP intake exists"], c:0,
+      e:"For US1, Agent ships logs over TLS-encrypted TCP to <code>agent-intake.logs.datadoghq.com:10516</code>. HTTPS (port 443) is also supported for HTTP transport.",
+      u:"https://docs.datadoghq.com/agent/logs/log_transport/"},
+    {l:"M",q:"On EU1 (Datadog EU site), which is the default log transport port over HTTPS?",
+      o:["10516","443","80","8125"], c:1,
+      e:"For EU1, logs go over HTTPS on port 443 by default. Use TLS-TCP on 443 if HTTP intake isn't available.",
+      u:"https://docs.datadoghq.com/agent/logs/log_transport/"},
+    {l:"M",q:"What is the role of the <code>kubelet</code> listener in Autodiscovery?",
+      o:["Forwards logs","Connects to the kubelet API on each node to enumerate pods/containers and read annotations","Replaces kube-state-metrics","Runs as a sidecar"], c:1,
+      e:"The kubelet listener queries the local kubelet to discover containers on the node and read AD annotations.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/integrations/"},
+    {l:"M",q:"True or false: %%env_MY_VAR%% in an AD template reads MY_VAR from the discovered container's environment.",
+      o:["True","False"], c:1,
+      e:"False. <code>%%env_MY_VAR%%</code> resolves to MY_VAR <b>as seen by the Agent process</b> (not the discovered container). Use other AD template variables for container-scoped values.",
+      u:"https://docs.datadoghq.com/containers/guide/template_variables/"},
+    {l:"M",q:"Which CIDR-related field does the Datadog ip-ranges endpoint return per service?",
+      o:["Only IPv4","Only IPv6","Both IPv4 and IPv6 prefixes","DNS names"], c:2,
+      e:"The endpoint returns both IPv4 (<code>prefixes_ipv4</code>) and IPv6 (<code>prefixes_ipv6</code>) prefixes per service per site.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"M",q:"Which is the BEST way to handle DogStatsD container origin detection on Kubernetes?",
+      o:["Hardcode the host","Use UDS with the Agent's origin-detection feature so submitted metrics inherit the container's tags","DNS-based","Manual sidecar"], c:1,
+      e:"With UDS + origin detection, the Agent identifies which container sent each datagram and applies env/service/version + pod tags automatically.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/unix_socket/"},
+    {l:"M",q:"What is the role of the <code>config_providers</code> setting in datadog.yaml?",
+      o:["Lists alert thresholds","Lists where to read AD templates from (docker, kubernetes, file)","Defines Agent install dir","Sets the API key"], c:1,
+      e:"<code>config_providers</code> tells Autodiscovery where to look for templates (e.g., docker labels, kubernetes annotations, etcd, consul, file).",
+      u:"https://docs.datadoghq.com/containers/guide/auto_conf/"},
+    /* --- HARD (10) --- */
+    {l:"H",q:"You configure DogStatsD on UDS and start submitting metrics from a container. Tags appear missing. Which is the MOST LIKELY cause?",
+      o:["Agent version too old (UDS origin detection requires Agent 6.27+/7+)","Tags must be encoded in JSON","Containers cannot use UDS","Tag dropping is on by default"], c:0,
+      e:"Origin detection over UDS requires modern Agents (>=6.27 / 7) and the Agent process to have access to /proc to map socket peer credentials to container IDs.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/unix_socket/"},
+    {l:"H",q:"In a strict-egress network, which Datadog intake hostnames typically need outbound TCP 443 (US1)? (Select the BEST description.)",
+      o:["api.datadoghq.com only","api., trace.agent., http-intake.logs., process., dbm-metrics-intake., (all at *.datadoghq.com)","Just *.aws.com","Random S3 buckets"], c:1,
+      e:"Open egress to each product's intake hostname under datadoghq.com for US1 (and equivalent subdomains for other sites). The exhaustive list is in the Network Traffic doc.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"H",q:"In Autodiscovery, where do you configure <code>logs:</code> templates for a containerized service?",
+      o:["Only in the main datadog.yaml","In pod annotations like <code>ad.datadoghq.com/&lt;container&gt;.logs</code> with a JSON list","DNS","System logs"], c:1,
+      e:"Logs configuration is part of AD: annotations like <code>ad.datadoghq.com/nginx.logs: '[{\"source\":\"nginx\",\"service\":\"web\"}]'</code> tell the Agent how to tag/parse logs from that container.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/log/"},
+    {l:"H",q:"Why is configuring AD via a Kubernetes Service annotation (endpoint check) different from pod annotations?",
+      o:["No difference","Endpoint checks let a check run once per endpoint (not per pod) — useful for backends behind a Service","Endpoint checks bypass the Agent","Service annotations only set tags"], c:1,
+      e:"Endpoint checks (registered on Services) execute on a Cluster Check Runner, targeting each endpoint behind the Service exactly once — avoiding duplicate work when many pods serve the same backend.",
+      u:"https://docs.datadoghq.com/containers/cluster_agent/endpointschecks/"},
+    {l:"H",q:"Why is opening UDP outbound from your Agent to Datadog usually unnecessary?",
+      o:["UDP is inbound on 8125 (DogStatsD) — outbound to Datadog uses TCP/443","UDP is encrypted","UDP is faster","Agents don't use UDP"], c:0,
+      e:"DogStatsD UDP is local on the host (client→Agent on 8125). The Agent then ships data outbound to Datadog over TCP/TLS, not UDP.",
+      u:"https://docs.datadoghq.com/agent/configuration/network/"},
+    {l:"H",q:"What is the implication of running the Agent in 'host' network mode in Kubernetes?",
+      o:["Pod IP equals host IP; DogStatsD UDP can be reached at localhost:8125 by all host-network pods","Datadog Agent ignores annotations","Loss of API access","Causes data duplication"], c:0,
+      e:"In host network mode, the Agent's DogStatsD port is reachable at 127.0.0.1:8125 by other host-network pods on the same node — sometimes used to simplify client config.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/integrations/"},
+    {l:"H",q:"Which configuration provider would you use to pull AD templates from etcd?",
+      o:["docker","kubernetes","etcd (with proper TLS and authorization)","file"], c:2,
+      e:"Datadog supports the <code>etcd</code> config provider (and consul, zookeeper). You point it at the key-value store containing your templates.",
+      u:"https://docs.datadoghq.com/containers/guide/auto_conf/"},
+    {l:"H",q:"What is a 'cluster check' vs a 'cluster service check'?",
+      o:["Synonyms","Cluster check = check that runs once per cluster (regardless of pods); typically scheduled on cluster check runners","Both are deprecated","Cluster service check is for events"], c:1,
+      e:"A cluster check executes once for the cluster (e.g., probing an external API). It's scheduled by the Cluster Agent across one or more Cluster Check Runners.",
+      u:"https://docs.datadoghq.com/containers/cluster_agent/clusterchecks/"},
+    {l:"H",q:"You see metrics arriving for a containerized integration but logs from the same container are absent. Which is the FIRST thing to check?",
+      o:["API key","<code>logs_enabled</code> in datadog.yaml AND the AD <code>logs:</code> annotation/template are both present","DNS","CPU limits"], c:1,
+      e:"Logs must be globally enabled (<code>logs_enabled: true</code>) AND the container must be selected by an AD logs template or annotation. Either missing piece breaks log collection.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/log/"},
+    {l:"H",q:"Why might you configure a Datadog Agent to use HTTP transport for logs instead of TCP?",
+      o:["HTTP enables more parallelism and is preferred for high throughput; TCP is for low-volume legacy use","HTTP is unencrypted","TCP doesn't exist","No reason"], c:0,
+      e:"HTTP transport (POSTs over TLS to http-intake.logs.&lt;site&gt;) is the recommended high-throughput transport. TCP intake on port 10516 remains for legacy compatibility.",
+      u:"https://docs.datadoghq.com/agent/logs/log_transport/"}
+  ]},
+  {id:"collection", name:"Data Collection", icon:"\u25CB",
+   blurb:"DogStatsD, crawlers, integrations, API endpoints, tagging, metrics.",
+   questions: [
+    /* --- EASY (15) --- */
+    {l:"E",q:"Which Datadog metric type captures a single point-in-time value (e.g., free memory)?",
+      o:["Gauge","Count","Rate","Distribution"], c:0,
+      e:"A GAUGE represents a value at a moment in time. The Agent reports the last value submitted in the flush interval.",
+      u:"https://docs.datadoghq.com/metrics/types/"},
+    {l:"E",q:"Which metric type represents a counter that increases over time?",
+      o:["Gauge","Count","Rate","Set"], c:1,
+      e:"COUNT submits the absolute number of occurrences within the flush interval — Datadog stores it as a sum.",
+      u:"https://docs.datadoghq.com/metrics/types/"},
+    {l:"E",q:"What does the Datadog 'crawler' refer to?",
+      o:["A web crawler scraping arbitrary websites","An integration where Datadog pulls data from a cloud provider's API on your behalf","A type of monitor","A backup tool"], c:1,
+      e:"Cloud crawlers (AWS, Azure, GCP, etc.) authenticate to the provider's API and pull metrics/events directly — no Agent required for some integrations.",
+      u:"https://docs.datadoghq.com/integrations/"},
+    {l:"E",q:"True or false: integrating with AWS via Datadog's cloud integration requires installing the Agent on every EC2 instance.",
+      o:["True","False"], c:1,
+      e:"False. The AWS crawler integration uses an IAM role and pulls CloudWatch metrics for the account. You can still install the Agent on EC2 hosts for richer per-host data.",
+      u:"https://docs.datadoghq.com/integrations/amazon_web_services/"},
+    {l:"E",q:"In a DogStatsD client, the line <code>page.views:1|c</code> submits which type of metric?",
+      o:["Gauge","Count","Distribution","Histogram"], c:1,
+      e:"<code>|c</code> denotes a counter. <code>|g</code> = gauge, <code>|h</code> = histogram, <code>|d</code> = distribution, <code>|s</code> = set.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/"},
+    {l:"E",q:"What is the recommended key:value format for Datadog tags?",
+      o:["KEY=VALUE","KEY:VALUE","KEY|VALUE","KEY/VALUE"], c:1,
+      e:"Datadog tags use <code>key:value</code> (e.g., <code>env:prod</code>, <code>service:web</code>). Single-value tags are also allowed.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/"},
+    {l:"E",q:"What is the maximum number of characters in a Datadog tag?",
+      o:["50","100","200","500"], c:2,
+      e:"A tag can be up to 200 characters. Key, colon, and value all count toward that limit.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/"},
+    {l:"E",q:"Which three tags form Unified Service Tagging?",
+      o:["env, service, version","host, datacenter, region","team, owner, cost_center","container, image, namespace"], c:0,
+      e:"Unified Service Tagging uses <code>env</code>, <code>service</code>, and <code>version</code> across metrics, traces, and logs for correlated observability.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/"},
+    {l:"E",q:"Which Datadog product surfaces Datadog's catalog of 600+ integrations for one-click install?",
+      o:["Watchdog","Integrations page","Service Catalog","Notebooks"], c:1,
+      e:"The Integrations page in the Datadog UI lists available integrations (Agent-based and crawlers) and walks you through setup.",
+      u:"https://docs.datadoghq.com/integrations/"},
+    {l:"E",q:"Which Datadog API endpoint is used to submit custom metrics via HTTP?",
+      o:["/api/v1/series","/api/v1/logs","/api/v1/events","/api/v1/check_run"], c:0,
+      e:"<code>POST /api/v1/series</code> submits metric series. Use DogStatsD for higher throughput.",
+      u:"https://docs.datadoghq.com/api/latest/metrics/"},
+    {l:"E",q:"Which file format does the Datadog Agent expect for integration configurations?",
+      o:["JSON","YAML","XML","TOML"], c:1,
+      e:"All integration configs are YAML — placed under <code>conf.d/&lt;integration&gt;.d/conf.yaml</code> with an <code>instances:</code> list.",
+      u:"https://docs.datadoghq.com/getting_started/integrations/"},
+    {l:"E",q:"What does a 'tag' do in Datadog?",
+      o:["Encrypts data","Provides searchable metadata to filter, group, and correlate telemetry","Replaces hostnames","Is required for the Agent to start"], c:1,
+      e:"Tags are key:value (or value) metadata attached to telemetry. They power filtering, grouping, and cross-product correlation.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/"},
+    {l:"E",q:"True or false: Datadog tags are case-sensitive.",
+      o:["True","False"], c:1,
+      e:"False. Metric tag keys are normalized to lowercase. Use lowercase keys to avoid drift (don't rely on case-sensitive matching).",
+      u:"https://docs.datadoghq.com/getting_started/tagging/"},
+    {l:"E",q:"Which integration mechanism is BEST for collecting metrics from a third-party application running on your host (e.g., PostgreSQL)?",
+      o:["Agent-based integration with PostgreSQL credentials in conf.yaml","Crawler","Custom DogStatsD","Hand-written cron job"], c:0,
+      e:"Datadog ships an Agent-based PostgreSQL integration. Provide credentials in <code>postgres.d/conf.yaml</code> and restart the Agent.",
+      u:"https://docs.datadoghq.com/integrations/postgres/"},
+    {l:"E",q:"What is the default DogStatsD flush interval to Datadog?",
+      o:["1s","5s","10s","60s"], c:2,
+      e:"DogStatsD aggregates and flushes every 10 seconds by default.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/"},
+    /* --- MEDIUM (25) --- */
+    {l:"M",q:"Which metric type sends raw values to Datadog for accurate percentile aggregation across hosts?",
+      o:["Histogram","Distribution","Gauge","Count"], c:1,
+      e:"DISTRIBUTION sends raw samples (DDSketch) to Datadog so percentiles (p50/p90/p99) are accurate globally. HISTOGRAM aggregates on the Agent and cannot be merged across hosts.",
+      u:"https://docs.datadoghq.com/metrics/distributions/"},
+    {l:"M",q:"Which metric type is computed by the Agent as 'count / interval'?",
+      o:["Gauge","Rate","Distribution","Set"], c:1,
+      e:"RATE = count per second over the flush interval. Useful for per-second views, but loses precision compared to COUNT for short bursts.",
+      u:"https://docs.datadoghq.com/metrics/types/"},
+    {l:"M",q:"A web service emits <code>requests:1|c|#env:prod,service:web,status:200</code>. What does this submit?",
+      o:["A counter named 'requests' with 3 tags","A gauge","A log line","A trace"], c:0,
+      e:"<code>|c</code> = counter. Tags after <code>|#</code> are attached. So this increments 'requests' tagged env:prod, service:web, status:200.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/"},
+    {l:"M",q:"Why is a HISTOGRAM less accurate than a DISTRIBUTION when you have many hosts emitting the same metric?",
+      o:["Histograms are aggregated per-Agent, so percentiles cannot be merged across hosts accurately","Histograms are slower","Histograms drop data","No difference"], c:0,
+      e:"HISTOGRAM percentiles are computed per Agent and cannot be merged correctly (the average of medians ≠ true median). DISTRIBUTION solves this by storing the full sketch globally.",
+      u:"https://docs.datadoghq.com/metrics/distributions/"},
+    {l:"M",q:"Where do tags applied at the Agent host level (datadog.yaml's <code>tags:</code>) attach?",
+      o:["Only to the Agent's own metrics","To every metric, log, and trace originating on that host","Only to logs","Only to events"], c:1,
+      e:"Host-level tags propagate to all telemetry shipped from that Agent — metrics, logs, traces, events, and service checks.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/assigning_tags/"},
+    {l:"M",q:"What is the Datadog API endpoint for submitting logs over HTTPS?",
+      o:["https://api.datadoghq.com/api/v1/logs","https://http-intake.logs.&lt;site&gt;/v1/input/&lt;API_KEY&gt;","UDP 514","TCP 8125"], c:1,
+      e:"Logs are POSTed to <code>http-intake.logs.&lt;site&gt;/v1/input/&lt;API_KEY&gt;</code> (or with a header). The Agent or direct integrations use this endpoint.",
+      u:"https://docs.datadoghq.com/api/latest/logs/"},
+    {l:"M",q:"A team uses inconsistent tag keys: 'env' and 'environment'. What is the practical consequence?",
+      o:["Datadog auto-merges them","The two keys are independent — dashboards/monitors can't combine telemetry by environment","Both keys are dropped","One is randomly chosen"], c:1,
+      e:"Tag keys are distinct. Standardize on Unified Service Tagging keys (<code>env</code>, <code>service</code>, <code>version</code>) to avoid fragmenting your data.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/"},
+    {l:"M",q:"Which is a valid character to BEGIN a tag string?",
+      o:["A digit","A letter","An underscore","A colon"], c:1,
+      e:"Tags must start with a letter (a-z, A-Z, or any unicode letter). Digits and special characters at the start are not consistently supported across products.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/"},
+    {l:"M",q:"Which Datadog mechanism allows you to convert log events into time-series metrics?",
+      o:["Log-Based Metrics (Generate Metrics)","DogStatsD","Trace Metrics","Pipeline aliasing"], c:0,
+      e:"Logs → Configuration → Generate Metrics lets you derive a metric from logs matching a query, optionally grouping by tags.",
+      u:"https://docs.datadoghq.com/logs/log_configuration/logs_to_metrics/"},
+    {l:"M",q:"Which is true about service-check submissions?",
+      o:["Service checks are metrics","Service checks are special status events (OK/WARNING/CRITICAL/UNKNOWN) submitted by integrations","Service checks are logs","Service checks are deprecated"], c:1,
+      e:"Service checks (OK=0, WARNING=1, CRITICAL=2, UNKNOWN=3) report the health of an integration's target. They power Service Check monitors.",
+      u:"https://docs.datadoghq.com/developers/service_checks/"},
+    {l:"M",q:"Which is a recommended way to add static tags to a containerized Agent?",
+      o:["Mount /etc/passwd","Set <code>DD_TAGS=\"env:prod team:billing\"</code> on the Agent container","Edit /etc/hosts","Use SSH"], c:1,
+      e:"<code>DD_TAGS</code> sets host-level tags. Use spaces between tags. Whitespace is NOT auto-converted to underscores, so include spaces only between distinct tags.",
+      u:"https://docs.datadoghq.com/agent/guide/environment-variables/"},
+    {l:"M",q:"What does the <code>integrations:</code> docs page actually represent in the Agent context?",
+      o:["A list of Datadog SaaS regions","The catalog of officially supported integrations (Agent + crawler) with setup steps","A list of monitors","Pricing tiers"], c:1,
+      e:"The Integrations page is the canonical catalog. Each integration documents requirements, conf.yaml format, and the metrics it produces.",
+      u:"https://docs.datadoghq.com/integrations/"},
+    {l:"M",q:"True or false: high-cardinality tags can dramatically increase your custom-metric bill.",
+      o:["True","False"], c:0,
+      e:"Custom metric pricing is per unique combination of metric name + tags. Adding unique IDs (user_id, request_id) explodes cardinality.",
+      u:"https://docs.datadoghq.com/account_management/billing/custom_metrics/"},
+    {l:"M",q:"Which Python method submits a count from a custom Agent check?",
+      o:["self.gauge('m', v)","self.count('m', v)","self.monotonic_count('m', v)","Both B and C are valid count submissions"], c:3,
+      e:"<code>count</code> accumulates a value per interval; <code>monotonic_count</code> derives the delta from an ever-growing counter (e.g., kernel counter). Both are valid count submissions.",
+      u:"https://docs.datadoghq.com/metrics/custom_metrics/agent_metrics_submission/"},
+    {l:"M",q:"In the AWS crawler integration, what is the typical authentication method?",
+      o:["Static AWS access keys","An IAM role assumed by Datadog from its account","Username/password","Kerberos"], c:1,
+      e:"You create an IAM role in your AWS account that trusts Datadog's principal (with an external ID), and Datadog assumes it to pull CloudWatch metrics, tags, and events.",
+      u:"https://docs.datadoghq.com/integrations/amazon_web_services/"},
+    {l:"M",q:"Which Datadog API endpoint queries a metric for a time range?",
+      o:["GET /api/v1/query","POST /api/v2/logs/search","GET /api/v1/monitor","POST /api/v1/dashboard"], c:0,
+      e:"<code>GET /api/v1/query?from=&to=&query=...</code> returns time-series points for a metric query.",
+      u:"https://docs.datadoghq.com/api/latest/metrics/"},
+    {l:"M",q:"Which is a Datadog Agent integration that uses 'cluster checks'?",
+      o:["A check that runs once per host","A check that runs once per cluster (e.g., an external HTTPS endpoint)","A check that disables itself","A monitor"], c:1,
+      e:"Cluster checks are scheduled by the Cluster Agent and executed once per cluster on Cluster Check Runners, avoiding N-way duplication.",
+      u:"https://docs.datadoghq.com/containers/cluster_agent/clusterchecks/"},
+    {l:"M",q:"True or false: events submitted via DogStatsD include a title and a body.",
+      o:["True","False"], c:0,
+      e:"The DogStatsD event format is <code>_e{title.length,body.length}:title|body|tags...</code>. Both title and body are required.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/"},
+    {l:"M",q:"Which is a 'reserved' Datadog tag key with special behavior?",
+      o:["env","service","version","All of the above"], c:3,
+      e:"<code>env</code>, <code>service</code>, and <code>version</code> are reserved keys that integrate across the platform via Unified Service Tagging.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/"},
+    {l:"M",q:"Which DogStatsD metric type would you use to count unique users in a time window?",
+      o:["Count","Gauge","Set","Histogram"], c:2,
+      e:"SET (|s) counts unique elements seen during the flush interval (Agent-side dedup). For cross-host dedup, use a different mechanism (e.g., a Distribution of user IDs is NOT recommended).",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/"},
+    {l:"M",q:"What is the BEST way to tag containerized workloads consistently?",
+      o:["Tag at the orchestrator level (Kubernetes labels) and rely on the Agent's tag extractor","Hand-edit each Agent","Tags can't be applied to containers","Use only env vars"], c:0,
+      e:"The Agent extracts Kubernetes labels/annotations into Datadog tags using the kubernetes_pod_labels_as_tags / annotations_as_tags settings, ensuring a single source of truth.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/tag/"},
+    {l:"M",q:"Which file path holds the Agent's official integration list (e.g., for an integration check named 'redisdb')?",
+      o:["/etc/datadog-agent/redis.yaml","/etc/datadog-agent/conf.d/redisdb.d/conf.yaml","/var/dd/redis.yml","/opt/datadog/redis"], c:1,
+      e:"Integration configs live under <code>/etc/datadog-agent/conf.d/&lt;integration&gt;.d/conf.yaml</code>.",
+      u:"https://docs.datadoghq.com/getting_started/integrations/"},
+    {l:"M",q:"Which Datadog API authentication header is REQUIRED for most read endpoints?",
+      o:["DD-API-KEY only","DD-APPLICATION-KEY only","Both DD-API-KEY and DD-APPLICATION-KEY","Bearer token only"], c:2,
+      e:"Most read APIs require both <code>DD-API-KEY</code> (org auth) and <code>DD-APPLICATION-KEY</code> (user/service-account auth).",
+      u:"https://docs.datadoghq.com/api/latest/authentication/"},
+    {l:"M",q:"Which Datadog product is the canonical way to ingest custom events programmatically?",
+      o:["Events API (POST /api/v1/events) or DogStatsD events","Audit log","Slack","Email"], c:0,
+      e:"Events are submitted via the Events API or as DogStatsD events. They appear in the Events Explorer and can trigger event monitors.",
+      u:"https://docs.datadoghq.com/api/latest/events/"},
+    {l:"M",q:"True or false: tags set in datadog.yaml are merged with tags set by the orchestrator (e.g., Kubernetes labels) for telemetry from that node.",
+      o:["True","False"], c:0,
+      e:"Host-level tags + orchestrator-derived tags + instance tags are all merged. Avoid duplication (same key with different values).",
+      u:"https://docs.datadoghq.com/getting_started/tagging/assigning_tags/"},
+    /* --- HARD (10) --- */
+    {l:"H",q:"You see <code>system.cpu.user</code> jumping erratically. Investigation shows the metric is reported as a GAUGE. What's the implication?",
+      o:["Datadog computes the rate automatically","The value is a snapshot — gaps or instantaneous spikes are normal; consider rate() or moving avg for stable views","Restart the Agent","File a bug"], c:1,
+      e:"Gauges are instantaneous and can be noisy. Use Datadog query functions (avg, moving_rollup, rate) or switch to RATE-based metrics for smoother analysis.",
+      u:"https://docs.datadoghq.com/metrics/types/"},
+    {l:"H",q:"A Python DogStatsD client buffers metrics. The application crashes. What happens to buffered metrics?",
+      o:["Datadog auto-recovers them","They are lost — DogStatsD is fire-and-forget","Datadog replays them","They are sent to logs"], c:1,
+      e:"DogStatsD has no durability. Application crashes lose buffered metrics. For critical counters, prefer Agent integrations or persistent queues.",
+      u:"https://docs.datadoghq.com/developers/dogstatsd/"},
+    {l:"H",q:"In a Kubernetes Deployment, which Agent setting promotes pod labels into Datadog tags?",
+      o:["DD_KUBERNETES_POD_LABELS_AS_TAGS","DD_LABEL_TAGS","DD_TAGS_AS_LABELS","DD_K8S_ENABLE_LABELS"], c:0,
+      e:"<code>DD_KUBERNETES_POD_LABELS_AS_TAGS</code> (or the YAML equivalent) maps pod labels to Datadog tags using a JSON dict.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/tag/"},
+    {l:"H",q:"A team submits a high-cardinality custom metric and the bill explodes. The fastest mitigation is:",
+      o:["Drop the metric and re-publish from scratch","Use 'Manage Tags' in Metric Settings to exclude high-cardinality tag values from indexing","Restart all Agents","Buy a bigger plan"], c:1,
+      e:"In Metrics Summary → tag exclusion, you can stop indexing certain tags or aggregate them — reducing cardinality without dropping the metric.",
+      u:"https://docs.datadoghq.com/metrics/custom_metrics/"},
+    {l:"H",q:"What is the practical reason to prefer Agent-based integrations over crawler integrations when possible?",
+      o:["Lower latency, higher granularity, richer per-host context, and no 5-minute CloudWatch delay","Crawlers are deprecated","Agents are free","Crawlers don't work"], c:0,
+      e:"Crawlers inherit cloud-provider limits (e.g., AWS CloudWatch granularity, retrieval delay). Agent integrations collect at native granularity (often 10–15s) with full tag fidelity.",
+      u:"https://docs.datadoghq.com/integrations/"},
+    {l:"H",q:"Which is TRUE about metric submission frequency vs the displayed resolution?",
+      o:["Datadog displays at exactly the submitted rate always","Datadog rolls up data based on the queried time window — short windows show finer granularity than long windows","Resolution is fixed at 1s","Resolution is fixed at 1h"], c:1,
+      e:"Datadog automatically rolls up time-series based on the queried window. Short windows = high resolution; long windows = aggregated. Use <code>rollup()</code> explicitly to control this.",
+      u:"https://docs.datadoghq.com/dashboards/querying/"},
+    {l:"H",q:"Which metric query function would you use to display per-second throughput from a counter?",
+      o:["sum_by","per_second()","avg","top"], c:1,
+      e:"<code>.as_rate()</code> or <code>per_second()</code> converts a COUNT into a per-second rate. Available in the query language and the UI.",
+      u:"https://docs.datadoghq.com/metrics/types/"},
+    {l:"H",q:"True or false: log-based metrics can use the same tag keys as ingested metrics for cross-correlation.",
+      o:["True","False"], c:0,
+      e:"Log-based metrics use the same tag namespace. Apply env/service/version consistently so dashboards and monitors can correlate logs-derived metrics with infrastructure metrics.",
+      u:"https://docs.datadoghq.com/logs/log_configuration/logs_to_metrics/"},
+    {l:"H",q:"Which is the BEST practice for tagging a metric with the customer who triggered an action?",
+      o:["Tag with the customer ID (high cardinality)","Tag with the customer's plan or segment (low cardinality) and store the ID in logs","Drop the metric","Use a free-form tag"], c:1,
+      e:"Avoid per-record IDs in metric tags (high cardinality → high cost). Keep IDs in logs (or distributions) and tag metrics with low-cardinality dimensions.",
+      u:"https://docs.datadoghq.com/metrics/custom_metrics/"},
+    {l:"H",q:"You upgrade a service and want to monitor the new version side-by-side. How do you slice metrics by deployed version automatically?",
+      o:["Manually create a new metric","Set DD_VERSION on the service so the version tag flows through metrics, traces, and logs","Use a different API key","Disable the old version"], c:1,
+      e:"With Unified Service Tagging, <code>DD_VERSION</code> (or the orchestrator's version label) creates a <code>version:</code> tag that propagates everywhere — enabling version-aware comparison out of the box.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/"}
+  ]},
+  {id:"trouble", name:"Troubleshooting", icon:"\u25BC",
+   blurb:"Agent commands, logs, configuration files.",
+   questions: [
+    /* --- EASY (15) --- */
+    {l:"E",q:"Which Agent CLI subcommand shows the current health of the Agent and its integrations?",
+      o:["status","health","info","check"], c:0,
+      e:"<code>sudo datadog-agent status</code> displays running checks, last collection times, forwarder transactions, and errors.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"E",q:"Which Agent CLI subcommand is used to bundle diagnostic data for a support case?",
+      o:["status","flare","config","check"], c:1,
+      e:"<code>sudo datadog-agent flare &lt;CASE_ID&gt;</code> packages logs, configs, and runtime info for Datadog Support.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/"},
+    {l:"E",q:"On Linux, where are Agent logs written by default?",
+      o:["/var/log/syslog","/var/log/datadog/agent.log","/etc/datadog-agent/log","~/dd.log"], c:1,
+      e:"Default Agent log path is <code>/var/log/datadog/agent.log</code> with rotation. trace-agent.log, process-agent.log, etc. sit alongside.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    {l:"E",q:"Which Agent CLI subcommand runs an integration on demand to see its raw output?",
+      o:["check","integration","run","test"], c:0,
+      e:"<code>sudo -u dd-agent datadog-agent check &lt;NAME&gt;</code> executes the integration once and prints metrics, events, and service checks.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/"},
+    {l:"E",q:"True or false: tail -f /var/log/datadog/agent.log is a valid way to watch the Agent in real time on Linux.",
+      o:["True","False"], c:0,
+      e:"True. tail -f streams new lines as they're written — standard for live troubleshooting.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    {l:"E",q:"Which YAML key enables verbose DEBUG logs in datadog.yaml?",
+      o:["log_level: DEBUG","verbose: true","debug: yes","trace: on"], c:0,
+      e:"Set <code>log_level: DEBUG</code> in datadog.yaml and restart. Use sparingly — DEBUG logs are noisy and can fill disk.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-configuration-files/"},
+    {l:"E",q:"What does running <code>datadog-agent configcheck</code> do?",
+      o:["Reloads the Agent","Prints the resolved configuration for each loaded integration (including Autodiscovery)","Sends a test metric","Lists tags"], c:1,
+      e:"<code>configcheck</code> shows what config the Agent is actually using after Autodiscovery resolves templates — invaluable for AD debugging.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"E",q:"Which command lists all running integration checks and when they last ran?",
+      o:["datadog-agent status","datadog-agent integrations","datadog-agent list","systemctl status"], c:0,
+      e:"<code>datadog-agent status</code> includes a 'Running Checks' section per integration with last collection time and any error.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"E",q:"What is the typical permission required to run Agent CLI commands on Linux?",
+      o:["root or sudo","Any user","Only the postgres user","No permissions"], c:0,
+      e:"Most Agent CLI commands require root/sudo or impersonating <code>dd-agent</code> (e.g., <code>sudo -u dd-agent datadog-agent check ...</code>).",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"E",q:"Where is the per-integration check log captured?",
+      o:["Inside the main agent.log, with the check name prefix","A separate log file per check","Datadog UI only","Syslog only"], c:0,
+      e:"Per-check logs (errors, warnings) appear in <code>agent.log</code> with the check name in the source field. Increase <code>log_level</code> for more detail.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    {l:"E",q:"True or false: deleting an integration's conf.yaml requires an Agent restart for the integration to stop running.",
+      o:["True","False"], c:1,
+      e:"False. The Agent's config watcher detects file changes under conf.d/ and reloads automatically. datadog.yaml changes still need a restart.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"E",q:"Which command prints the Agent's version?",
+      o:["datadog-agent version","datadog-agent --version (or 'datadog-agent version')","dd-version","agent-version"], c:1,
+      e:"Both <code>datadog-agent version</code> and <code>--version</code> print the running version. Useful when filing support cases.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"E",q:"Which log file would you check first if traces aren't reaching Datadog?",
+      o:["agent.log","trace-agent.log","process-agent.log","system-probe.log"], c:1,
+      e:"trace-agent.log captures APM intake and forwarding errors. Look for connection-refused or 4xx/5xx from the trace intake.",
+      u:"https://docs.datadoghq.com/tracing/troubleshooting/"},
+    {l:"E",q:"On Linux, which command shows whether the Agent service is enabled at boot?",
+      o:["systemctl status datadog-agent","systemctl is-enabled datadog-agent","ps aux | grep dd","service datadog-agent enabled"], c:1,
+      e:"<code>systemctl is-enabled datadog-agent</code> returns 'enabled' or 'disabled'. <code>systemctl status</code> shows whether it's currently running.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"E",q:"Which Agent subcommand specifically diagnoses connectivity to the Datadog intake?",
+      o:["datadog-agent check","datadog-agent diagnose","datadog-agent connectivity","datadog-agent flare"], c:1,
+      e:"<code>datadog-agent diagnose</code> probes connectivity to required Datadog endpoints and reports actionable failures.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    /* --- MEDIUM (25) --- */
+    {l:"M",q:"You change <code>log_level</code> to DEBUG in datadog.yaml. After how long do new logs reflect DEBUG output?",
+      o:["Immediately","After a restart of the Agent","After 10 minutes","Only after reboot"], c:1,
+      e:"Changes to datadog.yaml (including log_level) require an Agent restart. Use <code>sudo datadog-agent config set log_level debug</code> for a runtime change.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"Which subcommand temporarily sets a runtime config (e.g., log_level) without editing datadog.yaml?",
+      o:["datadog-agent config set log_level debug","datadog-agent runtime --log debug","datadog-agent debug","datadog-agent enable debug"], c:0,
+      e:"<code>datadog-agent config set</code> changes a runtime-mutable setting without a restart. Useful for short troubleshooting windows.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"You see 'API key was not found' in agent.log. What's the most likely root cause?",
+      o:["Network outage","Missing/incorrect <code>api_key</code> in datadog.yaml or the value contains whitespace","CPU exhaustion","Disk full"], c:1,
+      e:"Confirm <code>api_key:</code> is set and contains no leading/trailing whitespace. Restart the Agent. If correct, verify the key still exists in Org Settings.",
+      u:"https://docs.datadoghq.com/account_management/api-app-keys/"},
+    {l:"M",q:"Which file path on Linux holds the trace-agent log?",
+      o:["/var/log/datadog/trace-agent.log","/etc/datadog-agent/trace-agent.log","/var/lib/datadog/trace.log","/opt/datadog/trace.log"], c:0,
+      e:"<code>/var/log/datadog/trace-agent.log</code> is the canonical APM log path on Linux.",
+      u:"https://docs.datadoghq.com/tracing/troubleshooting/"},
+    {l:"M",q:"You run <code>datadog-agent status</code> and see 'Forwarder transactions in error'. What does that indicate?",
+      o:["A bad YAML","The Agent failed to send payloads to the Datadog intake (network/auth)","Disk full","Too many tags"], c:1,
+      e:"The forwarder is the component shipping data to Datadog. Errors indicate network failures, TLS issues, or invalid API key. Check <code>diagnose</code> next.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    {l:"M",q:"An integration's check shows 'Status: ERROR'. Which command yields the integration's traceback?",
+      o:["sudo datadog-agent check &lt;INTEGRATION&gt; -l debug","Restart the Agent","Reinstall the integration","Send a flare"], c:0,
+      e:"Running <code>check</code> with <code>-l debug</code> outputs the integration's stdout/stderr including Python tracebacks.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/"},
+    {l:"M",q:"Where does <code>datadog-agent flare</code> save the archive when not sent to Support directly?",
+      o:["/etc/datadog-agent/flare/","/tmp/datadog-agent/flare-&lt;timestamp&gt;.zip","Datadog UI","Stdout only"], c:1,
+      e:"By default the flare is saved under <code>/tmp</code> as a timestamped zip. You can manually upload it from the Datadog UI's support widget.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/"},
+    {l:"M",q:"You can't run <code>datadog-agent status</code> ('connection refused'). Which is the FIRST thing to check?",
+      o:["Whether the Agent process is running and the auth_token / cmd_port are readable by the invoking user","API key","Disk usage","Network DNS"], c:0,
+      e:"The status command talks to the running daemon over a local IPC port using the auth_token. If the Agent isn't running, or the user can't read the auth_token, it fails.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"Which is the safest way to test a YAML file syntax change to an integration?",
+      o:["Restart the Agent","Run <code>datadog-agent check &lt;name&gt;</code> after saving the file; YAML errors will be reported","Edit and pray","Delete the file"], c:1,
+      e:"<code>check</code> exercises the integration and surfaces YAML/parsing errors immediately, without restarting the whole Agent.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/"},
+    {l:"M",q:"You add a new integration but it doesn't appear in <code>datadog-agent status</code>. Likely cause?",
+      o:["Wrong file extension (.yml vs .yaml is fine, but file must be in correct directory)","Misplaced file outside <code>/etc/datadog-agent/conf.d/&lt;name&gt;.d/</code> or syntax error","DNS","Permissions on /proc"], c:1,
+      e:"The integration name must match a directory under <code>conf.d/&lt;name&gt;.d/</code>, AND the config must parse. Use <code>configcheck</code> to verify.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"How do you confirm what tags the Agent applies to a host's metrics, including those from Autodiscovery?",
+      o:["Check datadog.yaml","Run <code>sudo datadog-agent status</code> — 'Host tags' section lists all sources of host-level tags","Trust the dashboard","Look at /etc/hostname"], c:1,
+      e:"The status output enumerates host tags grouped by source (datadog.yaml, environment, cloud-provider, etc.).",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"Which Linux command prints disk space, useful if you suspect Agent buffers are filling /var?",
+      o:["du -sh /var","df -h","ls -al /var","find /var -size"], c:1,
+      e:"<code>df -h</code> shows filesystem usage by mountpoint. Use <code>du -sh /var/log/datadog</code> to drill into log size.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    {l:"M",q:"Which file would you inspect to confirm the Agent's currently active <code>api_key</code>?",
+      o:["/etc/datadog-agent/datadog.yaml","/etc/passwd","/var/log/datadog/agent.log (DEBUG only)","Both A; also use <code>datadog-agent config</code> CLI"], c:3,
+      e:"datadog.yaml is the source. <code>datadog-agent config</code> CLI prints the runtime view. Avoid leaking the key in logs.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"What is the BEST initial Agent troubleshooting workflow for 'metrics aren't showing in Datadog'?",
+      o:["1) status, 2) diagnose, 3) confirm DD_SITE & api_key, 4) flare if unresolved","Reinstall first","Restart 10 times","Ignore"], c:0,
+      e:"Status → Diagnose → site/key sanity → flare. This is Datadog Support's recommended ladder.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    {l:"M",q:"Which is true about the Agent's auth_token file?",
+      o:["It is the API key","It is a random local token that authorizes CLI ↔ Agent IPC and must be readable by the CLI user","It encrypts metrics","It is unused"], c:1,
+      e:"<code>/etc/datadog-agent/auth_token</code> is a random secret used for local IPC authentication. The CLI user (typically root or dd-agent) must be able to read it.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"Which log line would indicate misconfigured proxy egress for the Agent?",
+      o:["'No api_key configured'","'Forwarder transactions failed: i/o timeout' or TLS errors to api.&lt;site&gt;","Disk full","CPU saturation"], c:1,
+      e:"Proxy/firewall issues manifest as forwarder timeouts or TLS handshake errors. Verify <code>proxy</code> settings in datadog.yaml or DD_PROXY_HTTPS env var.",
+      u:"https://docs.datadoghq.com/agent/configuration/proxy/"},
+    {l:"M",q:"How do you disable an Agent integration WITHOUT deleting its config file?",
+      o:["Rename conf.yaml to conf.yaml.bak (the Agent only loads .yaml files)","Set <code>enabled: false</code>","Comment out the entire instances section","All of the above are valid workarounds"], c:3,
+      e:"Renaming to .bak removes it from autoload; clearing instances disables checks; some integrations honor an <code>enabled</code> flag. Pick the cleanest for your change-management process.",
+      u:"https://docs.datadoghq.com/getting_started/integrations/"},
+    {l:"M",q:"Which environment variable would temporarily raise log verbosity for a containerized Agent?",
+      o:["DD_LOG_LEVEL=debug","DD_DEBUG=1","DD_VERBOSE=true","DD_TRACE=on"], c:0,
+      e:"<code>DD_LOG_LEVEL=debug</code> (env var) takes effect at next container start. Equivalent to setting <code>log_level: debug</code> in datadog.yaml.",
+      u:"https://docs.datadoghq.com/agent/guide/environment-variables/"},
+    {l:"M",q:"You see 'Datadog Agent is not connected' in the UI for a host. What is a likely cause?",
+      o:["Agent process is down or unable to reach api.&lt;site&gt;","Wrong dashboard","Tag mismatch","Browser cache"], c:0,
+      e:"The Infrastructure List flag 'Not Connected' means the Agent stopped reporting heartbeats. Check <code>systemctl status</code> and <code>datadog-agent diagnose</code>.",
+      u:"https://docs.datadoghq.com/infrastructure/process/?tab=linuxwindows"},
+    {l:"M",q:"True or false: <code>datadog-agent jmx collect</code> prints JMX metrics for JMX-based integrations.",
+      o:["True","False"], c:0,
+      e:"<code>jmx collect</code>, <code>list_matching_attributes</code>, etc., are JMX-specific subcommands for troubleshooting JMXFetch-based integrations (Kafka, Cassandra, etc.).",
+      u:"https://docs.datadoghq.com/integrations/java/"},
+    {l:"M",q:"What does 'Status: ERROR' next to an integration mean in <code>datadog-agent status</code>?",
+      o:["Integration is up","Integration failed on its last collection (look at the error message and traceback shown)","Datadog is down","Network is fine"], c:1,
+      e:"It means the last execution raised an exception. The status block includes the message; use <code>check &lt;name&gt; -l debug</code> for the full traceback.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/"},
+    {l:"M",q:"Which environment variable disables the Agent's hostname auto-detection from cloud metadata?",
+      o:["DD_CLOUD_PROVIDER_METADATA=''","DD_HOSTNAME=<value>","DD_HOSTNAME_FQDN=false","Setting the hostname explicitly (e.g., DD_HOSTNAME) takes precedence over auto-detection"], c:3,
+      e:"Setting <code>DD_HOSTNAME</code> overrides cloud metadata detection. There are also flags to disable specific cloud-provider sources if needed.",
+      u:"https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/"},
+    {l:"M",q:"Where does the Agent persist payloads on disk if 'forwarder buffer to disk' is enabled?",
+      o:["/var/log/datadog","A configured retry queue path (default under /opt/datadog-agent/run/transactions_retry)","/tmp","Datadog cloud"], c:1,
+      e:"With persistent retry enabled, payloads are buffered on disk during network outages. Path is configurable via <code>forwarder_storage_path</code>.",
+      u:"https://docs.datadoghq.com/agent/configuration/dual-shipping/"},
+    {l:"M",q:"What does an empty 'Running Checks' section in <code>datadog-agent status</code> imply?",
+      o:["Agent is healthy","No integration configurations loaded — verify conf.d files and AD config","Datadog UI is down","Logs only"], c:1,
+      e:"Means the Agent isn't running any integration. Confirm files exist under conf.d/, no YAML parse errors, and AD listeners are configured for containers.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"M",q:"What is the role of <code>datadog-agent flare</code>'s redaction?",
+      o:["Removes any line","Scrubs sensitive values (api_key, passwords) from configs before bundling","Encrypts the flare","Sends data twice"], c:1,
+      e:"The flare auto-scrubs known sensitive YAML keys (api_key, password, token) so the support archive can be shared safely.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/"},
+    /* --- HARD (10) --- */
+    {l:"H",q:"You see 'Failed to connect to localhost:5001' from the Agent CLI. Which is the MOST LIKELY explanation?",
+      o:["DNS","cmd_port mismatch or Agent not running — the CLI talks to the daemon over the local IPC port","Network firewall","TLS expired"], c:1,
+      e:"Agent CLI ↔ daemon IPC happens on cmd_port (5001 default for Agent 7). If the Agent isn't up or cmd_port differs in datadog.yaml, connections fail.",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"H",q:"You upgrade from Agent 6 to Agent 7 and a custom Python check stops working. Most likely cause?",
+      o:["Permissions","Python 2 → Python 3 incompatibility in the custom check code","DNS","CPU"], c:1,
+      e:"Agent 7 dropped Python 2. Port the check to Python 3 (or stay on Agent 6 until ported).",
+      u:"https://docs.datadoghq.com/agent/"},
+    {l:"H",q:"What is the difference between <code>datadog-agent config</code> and <code>datadog-agent config-check</code>?",
+      o:["No difference","<code>config</code> prints the runtime resolved global config; <code>configcheck</code> prints loaded integration configs after Autodiscovery","Both are deprecated","Both restart the Agent"], c:1,
+      e:"<code>config</code> = effective datadog.yaml + env. <code>configcheck</code> = per-integration resolved templates (key for AD debugging).",
+      u:"https://docs.datadoghq.com/agent/configuration/agent-commands/"},
+    {l:"H",q:"Agent log shows 'Error 403 — Authentication failed'. Which steps in order resolve this fastest?",
+      o:["1) Verify <code>api_key</code> length/whitespace; 2) Confirm <code>site</code> matches your org; 3) Test with <code>diagnose</code>; 4) Recreate key in UI if needed","Reboot","Reformat the disk","Reinstall the OS"], c:0,
+      e:"403 = key invalid (typo, deleted, or wrong site). Verify key value, confirm <code>DD_SITE</code>, run <code>diagnose</code>, and recreate as last resort.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/"},
+    {l:"H",q:"You see thousands of 'Tag cardinality' warnings in agent.log. What does this indicate?",
+      o:["Network issue","An integration or DogStatsD client is producing tags with high cardinality — review tag values before billing spikes","Disk full","Memory leak"], c:1,
+      e:"The Agent emits cardinality warnings for metrics whose unique tag combinations exceed thresholds. Review and reduce — high cardinality drives custom-metric cost.",
+      u:"https://docs.datadoghq.com/metrics/custom_metrics/"},
+    {l:"H",q:"Which combination of files would you inspect to diagnose 'logs not arriving for one container only'?",
+      o:["agent.log + the AD <code>logs:</code> template for that container + container stdout permissions","Only datadog.yaml","Only DNS","No logs are needed"], c:0,
+      e:"Diagnose log delivery: confirm <code>logs_enabled: true</code>, AD <code>logs:</code> annotation on the pod, container stdout/stderr accessible, and no errors in <code>logs.log</code>.",
+      u:"https://docs.datadoghq.com/containers/kubernetes/log/"},
+    {l:"H",q:"What is the role of <code>system-probe.log</code>?",
+      o:["Agent main log","Logs for the system-probe component used by NPM, USM, Cloud Workload Security, etc.","DNS logs","Audit log"], c:1,
+      e:"system-probe is a separate Agent component that loads eBPF/probes for Network/Universal Service Monitoring and security features. It logs to <code>system-probe.log</code>.",
+      u:"https://docs.datadoghq.com/network_monitoring/performance/"},
+    {l:"H",q:"You modify <code>conf.d/postgres.d/conf.yaml</code> with a bad regex and the Agent silently stops collecting Postgres metrics. Which command would have caught it?",
+      o:["datadog-agent status","datadog-agent check postgres -l debug","datadog-agent flare","No way to catch"], c:1,
+      e:"Running <code>check postgres -l debug</code> exercises the integration with verbose output, showing the regex error before you wait for status.",
+      u:"https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/"},
+    {l:"H",q:"On Windows, where does the Agent write logs by default?",
+      o:["C:\\ProgramData\\Datadog\\logs\\","%TEMP%\\","C:\\Windows\\System32\\","Event Viewer only"], c:0,
+      e:"On Windows the Agent uses <code>C:\\ProgramData\\Datadog\\logs\\</code> for agent.log, trace-agent.log, etc.",
+      u:"https://docs.datadoghq.com/agent/basic_agent_usage/windows/"},
+    {l:"H",q:"You enable persistent forwarder buffering. What is the practical implication for short network outages?",
+      o:["No effect","Data is buffered to disk and replayed when the network returns, reducing data loss during transient outages","Data is dropped to disk","Agent crashes"], c:1,
+      e:"Persistent buffering writes payloads to disk during outages. When connectivity returns, the Agent replays them. Important for unreliable links and during planned maintenance.",
+      u:"https://docs.datadoghq.com/agent/configuration/dual-shipping/"}
+  ]},
+  {id:"viz", name:"Visualization & Utilization", icon:"\u25C7",
+   blurb:"Host Map, dashboards, metrics, tags, monitors & alerts.",
+   questions: [
+    /* --- EASY (15) --- */
+    {l:"E",q:"Which Datadog page gives a 2-D visualization of all hosts grouped and filtered by tags, with size and color encoding metrics?",
+      o:["Host Map","Service Map","Logs Explorer","Dashboards"], c:0,
+      e:"Host Map (and the Host Map dashboard widget) lays out hosts grouped/filtered/sized/colored by tags & metrics.",
+      u:"https://docs.datadoghq.com/infrastructure/hostmap/"},
+    {l:"E",q:"Which dashboard widget displays a single metric's current value with optional conditional coloring?",
+      o:["Timeseries","Query Value","Top List","Hostmap"], c:1,
+      e:"The Query Value widget shows a single number and can be colored by thresholds — perfect for KPI tiles.",
+      u:"https://docs.datadoghq.com/dashboards/widgets/query_value/"},
+    {l:"E",q:"Which widget plots a metric over time?",
+      o:["Timeseries","Query Value","Toplist","Pie"], c:0,
+      e:"The Timeseries widget renders one or more metric queries over a time range.",
+      u:"https://docs.datadoghq.com/dashboards/widgets/timeseries/"},
+    {l:"E",q:"Which widget shows a ranked list (top N) of tag values for a metric?",
+      o:["Top List","Timeseries","Query Value","Tablespace"], c:0,
+      e:"The Top List widget displays a ranked list of tag values for the chosen metric and aggregation.",
+      u:"https://docs.datadoghq.com/dashboards/widgets/top_list/"},
+    {l:"E",q:"What is the BEST description of a Datadog monitor?",
+      o:["A graph","A condition over data (metric, log query, service check, etc.) that triggers notifications when it crosses a threshold","A user","A tag"], c:1,
+      e:"Monitors evaluate a query against a threshold (or anomaly, forecast, etc.) and notify on state transitions.",
+      u:"https://docs.datadoghq.com/monitors/"},
+    {l:"E",q:"Which monitor type alerts on a static value crossing a threshold?",
+      o:["Metric (threshold)","Composite","Anomaly","Forecast"], c:0,
+      e:"Metric (threshold) monitors compare a metric's value to fixed thresholds (warning and alert).",
+      u:"https://docs.datadoghq.com/monitors/types/metric/"},
+    {l:"E",q:"What does a 'composite' monitor do?",
+      o:["Sums metrics","Combines multiple existing monitors with boolean logic (AND/OR/!) into one alert","Plots time-series","Sends emails"], c:1,
+      e:"Composite monitors reference other monitors by ID and combine their states with logical operators.",
+      u:"https://docs.datadoghq.com/monitors/types/composite/"},
+    {l:"E",q:"Which Datadog monitor type uses ML to alert on unusual behavior?",
+      o:["Anomaly Detection","Composite","Service Check","Metric"], c:0,
+      e:"Anomaly monitors use an algorithmic baseline that learns seasonality and trends to alert on deviations.",
+      u:"https://docs.datadoghq.com/monitors/types/anomaly/"},
+    {l:"E",q:"True or false: Datadog has only one dashboard type today.",
+      o:["True","False"], c:0,
+      e:"True. Datadog merged Timeboards and Screenboards into a single 'Dashboards' type with both timeseries and screen-like layouts.",
+      u:"https://docs.datadoghq.com/dashboards/"},
+    {l:"E",q:"What is the function of a dashboard 'template variable'?",
+      o:["Replaces metric names","Lets users filter all widgets on a dashboard by a tag value (e.g., env, host)","Restarts the Agent","Adds a comment"], c:1,
+      e:"Template variables drive interactive filters that propagate to all widgets — essential for reusable dashboards.",
+      u:"https://docs.datadoghq.com/dashboards/template_variables/"},
+    {l:"E",q:"What does the <code>avg by {service}</code> clause in a Datadog query do?",
+      o:["Restarts the Agent","Aggregates values into one series per unique <code>service</code> tag","Renames metrics","Hides services"], c:1,
+      e:"<code>by {tag}</code> groups time-series by that tag, producing one series per unique value. <code>avg/sum/max/min</code> are the aggregation function.",
+      u:"https://docs.datadoghq.com/dashboards/querying/"},
+    {l:"E",q:"True or false: tags can be used to filter monitors, dashboards, and queries.",
+      o:["True","False"], c:0,
+      e:"True. Tags are the universal filter dimension across metrics, monitors, dashboards, logs, traces, and infrastructure views.",
+      u:"https://docs.datadoghq.com/getting_started/tagging/using_tags/"},
+    {l:"E",q:"Which is a valid notification channel for a Datadog monitor?",
+      o:["Email","Slack","PagerDuty / Opsgenie / webhooks","All of the above"], c:3,
+      e:"Monitors support email, Slack, PagerDuty, Opsgenie, webhooks, Microsoft Teams, and many more via integrations.",
+      u:"https://docs.datadoghq.com/monitors/notify/"},
+    {l:"E",q:"In Host Map, what does the 'Fill by' option control?",
+      o:["The host's hostname","The color of each host hexagon (based on a metric)","Network speed","Tag count"], c:1,
+      e:"'Fill by' colors each host by a chosen metric (e.g., CPU usage). 'Group by' clusters hosts by tag; 'Filter by' subsets them.",
+      u:"https://docs.datadoghq.com/dashboards/widgets/hostmap/"},
+    {l:"E",q:"True or false: a dashboard can use both metric queries and log query widgets.",
+      o:["True","False"], c:0,
+      e:"True. Dashboards aggregate any Datadog data source (metrics, logs, traces, RUM, synthetics, etc.) on the same canvas.",
+      u:"https://docs.datadoghq.com/dashboards/widgets/"},
+    /* --- MEDIUM (25) --- */
+    {l:"M",q:"You want a monitor to evaluate the last 5 minutes of a metric and compare it to a fixed threshold. Which monitor type fits BEST?",
+      o:["Metric (threshold)","Service Check","Composite","Forecast"], c:0,
+      e:"Threshold metric monitors evaluate over a configurable 'evaluation window' (e.g., last 5m) against a static threshold.",
+      u:"https://docs.datadoghq.com/monitors/types/metric/"},
+    {l:"M",q:"Which dashboard widget is BEST suited to show the rate of requests per second across services with stacked colors?",
+      o:["Stacked Timeseries (Timeseries widget with 'Area' or 'Bars' and stacking)","Toplist","Pie","Hostmap"], c:0,
+      e:"Timeseries with stacked area/bar display works well for cumulative throughput across grouping. <code>by {service}</code> drives the colors.",
+      u:"https://docs.datadoghq.com/dashboards/widgets/timeseries/"},
+    {l:"M",q:"What does '@user.email' do in a monitor notification template?",
+      o:["Sets a variable","Sends the notification to the email address user.email","Filters the alert","Logs the alert"], c:1,
+      e:"Using <code>@email@domain.com</code> in the monitor message sends a notification to that email. Templated values like <code>{{host.name}}</code> are also supported.",
+      u:"https://docs.datadoghq.com/monitors/notify/"},
+    {l:"M",q:"Which is a valid <code>@-mention</code> for Slack?",
+      o:["@slack-channel-name","@user","@slack-&lt;workspace&gt;-&lt;channel&gt;","Email"], c:2,
+      e:"Slack mentions use the form <code>@slack-&lt;workspace&gt;-&lt;channel&gt;</code> matching the configured Slack integration in Datadog.",
+      u:"https://docs.datadoghq.com/integrations/slack/"},
+    {l:"M",q:"Which BEST describes 'monitor states'?",
+      o:["Active / inactive","OK, Warn, Alert, No Data, Unknown (Service Check only)","On / Off","Green / Red"], c:1,
+      e:"Datadog monitors transition through OK, WARN (Warning), ALERT (Critical), NO DATA. Service Check monitors also have UNKNOWN.",
+      u:"https://docs.datadoghq.com/monitors/"},
+    {l:"M",q:"What is the function of 'No Data' alerts on a monitor?",
+      o:["Suppresses alerts","Triggers an alert when the metric stops reporting for a configured window","Forwards data","Replays missed data"], c:1,
+      e:"No-Data alerts catch silent failures (Agent down, process crashed) by triggering when data stops arriving for N minutes.",
+      u:"https://docs.datadoghq.com/monitors/notify/"},
+    {l:"M",q:"You want to ensure a monitor doesn't fire during planned maintenance. Which feature should you use?",
+      o:["Downtimes (one-time or recurring)","Delete the monitor","Pause Datadog","Lower the threshold"], c:0,
+      e:"Downtimes mute one or many monitors for a window (one-time or recurring) without modifying their config.",
+      u:"https://docs.datadoghq.com/monitors/downtimes/"},
+    {l:"M",q:"What does the 'group by' choice in a metric monitor affect?",
+      o:["Notification channel","Whether the monitor evaluates per-tag (multi-alert) or as a single aggregate","Whether the monitor is composite","API key"], c:1,
+      e:"Group-by turns a monitor into a 'multi-alert' that evaluates per tag value and alerts independently per group.",
+      u:"https://docs.datadoghq.com/monitors/types/metric/"},
+    {l:"M",q:"Which is a valid Host Map use case?",
+      o:["Spotting a noisy host whose CPU is much higher than peers via color","Reading a log","Sending an email","Reconciling a bill"], c:0,
+      e:"Host Map visualizes outliers across a fleet — instantly spot high CPU, memory, or any chosen metric.",
+      u:"https://docs.datadoghq.com/infrastructure/hostmap/"},
+    {l:"M",q:"Which monitor type checks the status of an integration's service (OK/WARNING/CRITICAL)?",
+      o:["Service Check","Anomaly","Forecast","Composite"], c:0,
+      e:"Service Check monitors alert on transitions between OK/WARNING/CRITICAL/UNKNOWN status codes emitted by integrations.",
+      u:"https://docs.datadoghq.com/monitors/types/service_check/"},
+    {l:"M",q:"You want to forecast disk usage and alert before it fills. Which monitor type fits?",
+      o:["Forecast","Anomaly","Threshold","Composite"], c:0,
+      e:"Forecast monitors project a metric into the future based on past data and alert when it's predicted to cross a threshold.",
+      u:"https://docs.datadoghq.com/monitors/types/forecasts/"},
+    {l:"M",q:"True or false: any dashboard widget can be exported as an alert by 'Create Monitor' from the widget.",
+      o:["True","False"], c:0,
+      e:"True. Most metric widgets offer a 'Create Monitor' shortcut that opens the monitor builder pre-filled with the widget's query.",
+      u:"https://docs.datadoghq.com/dashboards/widgets/"},
+    {l:"M",q:"Which is true about dashboard 'preset' (system) dashboards?",
+      o:["You can edit them directly","They are read-only; clone them to make changes","They are unavailable in trial accounts","They are user-specific"], c:1,
+      e:"Datadog ships preset dashboards (per integration). They are read-only — clone them to customize.",
+      u:"https://docs.datadoghq.com/dashboards/"},
+    {l:"M",q:"Which Datadog query function applies a moving rollup over a window?",
+      o:["moving_rollup()","rollup() / .rollup(avg, 60)","ewma()","avg_by"], c:1,
+      e:"<code>.rollup(method, seconds)</code> applies an explicit aggregation over fixed buckets — useful when comparing across time windows.",
+      u:"https://docs.datadoghq.com/dashboards/querying/"},
+    {l:"M",q:"You have a 'multi-alert' monitor grouped by service. A new service appears. Will the monitor evaluate it?",
+      o:["Yes, the multi-alert evaluates each new group as it appears","No, you must manually edit it","Only after a rebuild","Only with API"], c:0,
+      e:"Multi-alerts evaluate per-group dynamically. New tag values are automatically included.",
+      u:"https://docs.datadoghq.com/monitors/types/metric/"},
+    {l:"M",q:"Which is true about 'log monitors'?",
+      o:["They alert on metric thresholds","They alert when a log query exceeds a count threshold (or matches a pattern) within a window","They alert on traces","They alert on events"], c:1,
+      e:"Log monitors run a log query and alert when matching log volume exceeds the configured threshold over the eval window.",
+      u:"https://docs.datadoghq.com/monitors/types/log/"},
+    {l:"M",q:"True or false: when grouping a monitor by 'host', you create a per-host alert that fires independently for each host.",
+      o:["True","False"], c:0,
+      e:"True. <code>by {host}</code> creates a multi-alert evaluated per host — independent transitions and notifications.",
+      u:"https://docs.datadoghq.com/monitors/types/metric/"},
+    {l:"M",q:"Which dashboard widget visualizes service-to-service dependencies?",
+      o:["Service Map","Toplist","Pie","Hostmap"], c:0,
+      e:"The Service Map widget (and APM Service Map page) visualizes upstream/downstream dependencies derived from APM traces.",
+      u:"https://docs.datadoghq.com/tracing/services/services_list/"},
+    {l:"M",q:"In a Top List widget, what does 'Relative display mode' do?",
+      o:["Sorts alphabetically","Shows each value as a percent of the total","Hides the legend","Reverses the order"], c:1,
+      e:"Relative mode renders bars as percentages of the total — useful for share-of-X visualizations.",
+      u:"https://docs.datadoghq.com/dashboards/widgets/top_list/"},
+    {l:"M",q:"Which feature mutes ALL monitors for a service during a deploy?",
+      o:["Global downtime","Recurring downtime","Scheduled downtime scoped to <code>service:&lt;name&gt;</code>","All of the above are valid approaches"], c:3,
+      e:"Downtimes can be one-time or recurring, global or scoped to tags. For deploys, a one-time tag-scoped downtime is typical (e.g., <code>service:web</code>).",
+      u:"https://docs.datadoghq.com/monitors/downtimes/"},
+    {l:"M",q:"True or false: tags applied at the metric level are available in dashboard template variables.",
+      o:["True","False"], c:0,
+      e:"True. Any tag key that exists on the underlying metrics can drive a template variable filter on a dashboard.",
+      u:"https://docs.datadoghq.com/dashboards/template_variables/"},
+    {l:"M",q:"Which is the BEST way to view per-host metrics across a fleet of 500 EC2 instances grouped by env and region?",
+      o:["Single timeseries","Host Map with 'Group by env, region' and a fill-by metric","Pie","Email"], c:1,
+      e:"Host Map groups hosts visually by tag and colors them by metric — ideal for fleet-scale visual inspection.",
+      u:"https://docs.datadoghq.com/infrastructure/hostmap/"},
+    {l:"M",q:"What does 'Monitor evaluation window' refer to?",
+      o:["How often the monitor runs","The lookback period over which the query is computed (e.g., last 5 minutes)","The notification delay","The dashboard refresh"], c:1,
+      e:"Evaluation window = the time range used for each evaluation. Datadog also has 'evaluation frequency' (how often the query runs).",
+      u:"https://docs.datadoghq.com/monitors/types/metric/"},
+    {l:"M",q:"True or false: 'auto-resolve' can automatically close stale triggered alerts after a configured time.",
+      o:["True","False"], c:0,
+      e:"True. The 'Notify if data is missing' / auto-resolve options control how stale alerts age out.",
+      u:"https://docs.datadoghq.com/monitors/configuration/"},
+    {l:"M",q:"Which dashboard sharing option exposes a read-only public link?",
+      o:["Public URL with optional template-variable lock","Slack only","Permission-only","Datadog disables sharing"], c:0,
+      e:"Public URL sharing exposes a read-only snapshot, optionally with locked template variables or time range.",
+      u:"https://docs.datadoghq.com/dashboards/sharing/"},
+    /* --- HARD (10) --- */
+    {l:"H",q:"Which monitor type would BEST catch 'login latency is normally 100ms but is now 400ms — without a fixed threshold'?",
+      o:["Anomaly Detection","Forecast","Outlier (compare a group against its peers)","Composite"], c:0,
+      e:"Anomaly Detection learns the expected band and alerts when the metric deviates. Outlier monitors compare a group against its peers — also valid, depending on shape.",
+      u:"https://docs.datadoghq.com/monitors/guide/anomaly-monitor/"},
+    {l:"H",q:"Which would BEST detect 'one host's CPU is much higher than its peers'?",
+      o:["Outlier Monitor","Composite","Threshold","Forecast"], c:0,
+      e:"Outlier monitors compare members of a tag group (e.g., hosts) against the group's behavior — perfect for noisy-neighbor detection.",
+      u:"https://docs.datadoghq.com/monitors/types/outlier/"},
+    {l:"H",q:"In a multi-alert grouped by env,service, an alert fires for env:prod,service:web. Then env:prod,service:web also recovers. What is the resulting notification?",
+      o:["One ALERT and one RECOVERY notification","One ALERT only","No notifications","Two ALERTs"], c:0,
+      e:"Per-group transitions trigger their own notifications: ALERT on cross-threshold, RECOVERY on return to OK.",
+      u:"https://docs.datadoghq.com/monitors/types/metric/"},
+    {l:"H",q:"What is a common pitfall when grouping a monitor by a high-cardinality tag like 'request_id'?",
+      o:["No effect","Each unique value becomes an independent alert evaluation — costly and noisy","Reduces cost","Improves accuracy"], c:1,
+      e:"High-cardinality grouping creates massive alert evaluation work and noisy notifications. Group by stable, low-cardinality tags (env, service, host) instead.",
+      u:"https://docs.datadoghq.com/monitors/types/metric/"},
+    {l:"H",q:"You want a monitor that fires only if errors are >1% of total requests. Which approach works?",
+      o:["Use a 'metric' monitor with a formula or query that computes ratio: errors / requests > 0.01","Two threshold monitors AND'd in a composite","Both A and B can work","Forecast"], c:2,
+      e:"You can build a formula/ratio query inline OR combine two threshold monitors via a composite. Formulas are simpler and more accurate.",
+      u:"https://docs.datadoghq.com/monitors/configuration/"},
+    {l:"H",q:"What is the role of <code>@notify-no-data</code> escalations?",
+      o:["Suppresses no-data","Notifies a separate channel when the monitor enters NO DATA state","Replays data","Restarts the Agent"], c:1,
+      e:"You can route different alert states (alert, warn, no-data) to different channels using <code>@-handles</code> with conditional templating.",
+      u:"https://docs.datadoghq.com/monitors/notify/"},
+    {l:"H",q:"Which dashboard widget supports drawing arbitrary SQL-like analyses on logs?",
+      o:["Log Stream / Log Analytics widgets","Timeseries only","Hostmap","Pie"], c:0,
+      e:"Datadog provides Log Stream, Log Analytics (timeseries/toplist/table) widgets to render log queries directly on dashboards.",
+      u:"https://docs.datadoghq.com/dashboards/widgets/"},
+    {l:"H",q:"True or false: a forecast monitor's projection accuracy depends on past data quality and seasonality alignment.",
+      o:["True","False"], c:0,
+      e:"True. Forecasts assume stationary patterns and require enough history; sudden regime changes (e.g., feature launches) reduce accuracy.",
+      u:"https://docs.datadoghq.com/monitors/types/forecasts/"},
+    {l:"H",q:"What is the BEST description of 'monitor evaluation delay'?",
+      o:["Delay between query runs","Wait time before evaluating, to account for late-arriving data","Notification cooldown","Group-by interval"], c:1,
+      e:"Evaluation delay (seconds) pushes the evaluation back to wait for late data — critical for high-cardinality or batched metrics.",
+      u:"https://docs.datadoghq.com/monitors/configuration/"},
+    {l:"H",q:"Which approach helps avoid alert fatigue while still catching real incidents?",
+      o:["Lower thresholds","Use multi-step alerts (warn + critical), evaluation delay, and require sustained breach (eval window) before alerting","Disable monitors","Send all alerts to email"], c:1,
+      e:"Best practice: separate warning vs critical thresholds, set a sustained eval window, and use eval delay. This reduces flapping and noise.",
+      u:"https://docs.datadoghq.com/monitors/configuration/"}
+  ]}
+];
+
+/* ====== STATE & ENGINE ====== */
+const state = {
+  domainIdx:0, qIdx:0,
+  order:[],         // shuffled order
+  answers:{},       // {domainId: {qIndex: {chosen:n, correct:bool}}}
+  reviewMode:false
+};
+
+const $ = (sel)=>document.querySelector(sel);
+const el = (tag,props={},...kids)=>{
+  const e = document.createElement(tag);
+  for (const k in props){
+    if (k === "class") e.className = props[k];
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), props[k]);
+    else if (k === "html") e.innerHTML = props[k];
+    else e.setAttribute(k, props[k]);
+  }
+  kids.forEach(k=>{ if(k!=null) e.appendChild(typeof k==="string"?document.createTextNode(k):k); });
+  return e;
+};
+
+function curDomain(){ return DOMAINS[state.domainIdx]; }
+function curQList(){
+  const d = curDomain();
+  if (state.reviewMode){
+    const a = state.answers[d.id] || {};
+    return state.order.filter(i => a[i] && a[i].correct === false);
+  }
+  return state.order;
+}
+function renderTabs(){
+  const tabs = $("#tabs"); tabs.innerHTML = "";
+  DOMAINS.forEach((d,i)=>{
+    const t = el("div",{class:"tab"+(i===state.domainIdx?" active":""),
+      onclick:()=>{state.domainIdx=i;state.qIdx=0;state.reviewMode=false;initDomain();}},
+      d.icon+"  "+d.name,
+      el("span",{class:"badge"}, String(d.questions.length))
+    );
+    tabs.appendChild(t);
+  });
+}
+
+function initDomain(){
+  const d = curDomain();
+  state.order = d.questions.map((_,i)=>i);
+  state.qIdx = 0;
+  if (!state.answers[d.id]) state.answers[d.id] = {};
+  renderTabs(); render();
+}
+
+function shuffle(arr){
+  for (let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+}
+
+function letter(i){ return ["A","B","C","D","E"][i]; }
+
+function render(){
+  const d = curDomain();
+  const list = curQList();
+  const totalAns = Object.values(state.answers[d.id]||{});
+  const correct = totalAns.filter(x=>x.correct).length;
+  const wrong = totalAns.filter(x=>!x.correct).length;
+  const answered = totalAns.length;
+  $("#stDomain").textContent = d.name;
+  $("#stCorrect").textContent = correct;
+  $("#stWrong").textContent = wrong;
+  $("#stScore").textContent = answered ? Math.round(100*correct/answered)+"%" : "—";
+  $("#progressBar").style.width = list.length ? (100*state.qIdx/list.length)+"%" : "0%";
+  $("#stPos").textContent = (list.length?state.qIdx+1:0)+" / "+list.length;
+
+  const area = $("#quizArea"); area.innerHTML = "";
+
+  if (!list.length){
+    area.appendChild(el("div",{class:"panel empty"},
+      state.reviewMode ? "No incorrect answers to review in this domain. Nice!" : "No questions in this domain."));
+    return;
+  }
+  if (state.qIdx >= list.length){
+    renderSummary(area); return;
+  }
+
+  const qi = list[state.qIdx];
+  const q = d.questions[qi];
+  const card = el("div",{class:"panel qcard"});
+  const meta = el("div",{class:"qmeta"},
+    el("span",{class:"pill "+q.l}, q.l==="E"?"Easy":q.l==="M"?"Medium":"Hard"),
+    el("span",{}, "Question "+(state.qIdx+1)+" of "+list.length),
+    el("span",{}, "· Domain: "+d.name)
+  );
+  card.appendChild(meta);
+  card.appendChild(el("div",{class:"qtext", html:q.q}));
+
+  const opts = el("div",{class:"options"});
+  const prev = state.answers[d.id][qi];
+
+  q.o.forEach((text,oi)=>{
+    let cls = "opt";
+    if (prev){
+      cls += " disabled";
+      if (oi === q.c) cls += " correct";
+      else if (oi === prev.chosen) cls += " incorrect";
+    }
+    const o = el("button",{class:cls, html:""},
+      el("span",{class:"letter"}, letter(oi)+"."),
+      el("span",{html:text})
+    );
+    if (!prev){
+      o.addEventListener("click", ()=>chooseAnswer(qi,oi));
+    }
+    opts.appendChild(o);
+  });
+  card.appendChild(opts);
+
+  // Explanation
+  const exp = el("div",{class:"explanation"+(prev?" shown":"")});
+  if (prev){
+    const tag = el("span",{class:"label "+(prev.correct?"ok":"bad")},
+      prev.correct?"Correct":"Incorrect");
+    exp.appendChild(tag);
+    exp.appendChild(el("span",{html:" The correct answer is <b>"+letter(q.c)+"</b>. "+q.e}));
+    if (q.u){
+      const a = el("a",{href:q.u, target:"_blank", rel:"noopener", class:"doc"},
+        "\u2192 Official documentation: "+q.u);
+      exp.appendChild(a);
+    }
+  }
+  card.appendChild(exp);
+
+  // Nav
+  const nav = el("div",{class:"nav"});
+  const prevBtn = el("button",{class:"btn", onclick:()=>{
+    if (state.qIdx>0){state.qIdx--;render();}
+  }}, "\u2190 Previous");
+  prevBtn.disabled = state.qIdx===0;
+  const nextBtn = el("button",{class:"btn primary", onclick:()=>{
+    state.qIdx++; render();
+  }}, state.qIdx===list.length-1?"Finish \u2192":"Next \u2192");
+  if (!prev) nextBtn.disabled = true;
+  nav.appendChild(prevBtn); nav.appendChild(nextBtn);
+  card.appendChild(nav);
+
+  area.appendChild(card);
+}
+
+function chooseAnswer(qi, chosen){
+  const d = curDomain();
+  const q = d.questions[qi];
+  state.answers[d.id][qi] = { chosen, correct: chosen === q.c };
+  render();
+}
+
+function renderSummary(area){
+  const d = curDomain();
+  const list = curQList();
+  const a = state.answers[d.id] || {};
+  const answered = list.map(i=>a[i]).filter(Boolean);
+  const correct = answered.filter(x=>x.correct).length;
+  const pct = answered.length ? Math.round(100*correct/answered.length) : 0;
+  const cls = pct>=80?"good":pct>=65?"mid":"bad";
+  const verdict = pct>=80?"You are exam-ready on this domain. 🎯"
+                : pct>=65?"Solid — review the missed questions and re-take."
+                : "Needs more study. Re-read the docs for the missed questions.";
+
+  const wrap = el("div",{class:"panel summary"});
+  wrap.appendChild(el("div",{}, "Domain complete: "+d.name));
+  wrap.appendChild(el("div",{class:"score "+cls}, pct+"%"));
+  wrap.appendChild(el("div",{}, correct+" correct of "+answered.length));
+  wrap.appendChild(el("div",{html:"<br>"+verdict}));
+  const nav = el("div",{class:"nav", style:"justify-content:center;margin-top:18px"});
+  nav.appendChild(el("button",{class:"btn primary",onclick:()=>{
+    state.reviewMode = true;
+    state.qIdx = 0;
+    render();
+  }}, "Review missed only"));
+  nav.appendChild(el("button",{class:"btn",onclick:()=>{
+    state.reviewMode = false;
+    state.qIdx = 0;
+    render();
+  }}, "Restart this domain"));
+  nav.appendChild(el("button",{class:"btn",onclick:()=>{
+    if (state.domainIdx < DOMAINS.length-1){
+      state.domainIdx++; initDomain();
+    }
+  }}, "Next domain \u2192"));
+  wrap.appendChild(nav);
+  area.appendChild(wrap);
+}
+
+$("#shuffleBtn").addEventListener("click",()=>{
+  shuffle(state.order); state.qIdx = 0; state.reviewMode=false; render();
+});
+$("#resetBtn").addEventListener("click",()=>{
+  const d = curDomain();
+  if (confirm("Clear your answers for "+d.name+"?")){
+    state.answers[d.id] = {};
+    state.qIdx = 0;
+    state.reviewMode = false;
+    render();
+  }
+});
+$("#reviewBtn").addEventListener("click",()=>{
+  state.reviewMode = !state.reviewMode;
+  state.qIdx = 0; render();
+});
+
+initDomain();
+</script>
+</body>
+</html>
